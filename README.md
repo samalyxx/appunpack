@@ -11,6 +11,12 @@
 
 ![AppUnpack: a local APK becomes decompiled Java, decoded resources and an evidence report.](site/assets/hero.svg)
 
+[▶ Watch the 24-second real APK demo](https://github.com/samalyxx/appunpack/releases/download/v0.2.1/AppUnpack-24s-features-demo.mp4)
+
+Real NetGuard 2.337 analysis: manifest, permissions, resources and reconstructed Java. Edited for pacing; recovery is partial. Feature cards summarize code navigation, CLI/MCP and evidence reports.
+
+Music: “Brain Dance” by Kevin MacLeod ([incompetech.com](https://incompetech.com/music/royalty-free/index.html?isrc=USUAN2300006)), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Edited excerpt, loudness adjusted, fades added.
+
 AppUnpack is a local Android APK decompiler and analysis CLI powered by [JADX](https://github.com/skylot/jadx) through [jadx-headless-mcp](https://github.com/1013503897/jadx-headless-mcp). Analyze a file directly, inspect specific classes and methods, or connect an AI coding agent through MCP. A separate Python command inventories iOS IPA metadata.
 
 ## Quick start
