@@ -49,6 +49,20 @@ test("invalid local command arguments fail before starting Java", async () => {
   }
 });
 
+test("extended workflows require explicit targets and bounded captures", async () => {
+  for (const command of ["splits", "decode", "native", "pull"]) {
+    await assert.rejects(main([command, "input"]), /requires --output/);
+  }
+  await assert.rejects(main(["packages"]), /requires --device/);
+  await assert.rejects(main(["frida-ps"]), /requires --device/);
+  await assert.rejects(main(["devices", "--device", "emulator-5580"]), /not supported/);
+  await assert.rejects(main(["decode", "input.apk", "--output", "out", "--device", "local"]), /not supported/);
+  for (const seconds of ["0", "-1", "1.5", "301", "9007199254740992", "1;echo"]) {
+    await assert.rejects(main(["logcat", "--device", "emulator-5580", "--output", "out", `--seconds=${seconds}`]), /integer from 1 to 300/);
+  }
+  await assert.rejects(main(["trace", "123", "script.js", "--device", "local", "--output", "out"]), /integer from 1 to 300/);
+});
+
 test("an APK alone selects its sibling output and preserves an existing analysis", async (t) => {
   const directory = await mkdtemp(join(tmpdir(), "appunpack-default-"));
   t.after(() => rm(directory, { recursive: true, force: true }));

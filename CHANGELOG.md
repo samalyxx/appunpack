@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.2.0 — 2026-10-20
+
+- Analyze compatible base/split APK directories and unambiguous `.apks`/`.xapk` archives together with JADX. Record per-part identities/hashes and retain each part's decoded resources. Refuse ambiguous bundletool variants and mismatched sets.
+- Add optional Apktool resource/smali decoding, native ELF/APK-member Ghidra pseudocode and function reports.
+- Add ADB device/package listing, base/split APK pulling and bounded logcat capture.
+- Add Frida process listing and bounded explicit-PID captures with a saved user script snapshot.
+- Bound subprocess output, deadlines, cancellation and process-tree cleanup; apply a ten-minute deadline to full JADX export.
+- Document optional setup, exact CLI scope, outputs and verification limits. These integrations do not automatically extend the upstream JADX MCP server.
+
+
 ## 0.1.0 — 2026-10-20
 
 Initial public release of AppUnpack.

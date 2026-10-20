@@ -8,7 +8,7 @@
 | npm and Git | Repository installation |
 | Java | Java 17 or newer JDK with the compiler module for full APK export; a Java runtime suffices for `inspect` and MCP |
 | JADX headless engine | Pinned 0.7.1 JAR installed by `install-tools` |
-| Python | 3.10 or newer, only for `ipa` |
+| Python | 3.10+ for IPA, split sets, APK preflight and APK native-library extraction |
 
 AppUnpack uses the pinned headless JAR for both inspection and full export. Full export launches the included `src/Export.java` with Java's source launcher, so it needs a JDK with compiler modules. It does not require Android SDK tools or a running Android device. Android Studio's bundled Java can be selected when it includes the required modules.
 
@@ -91,6 +91,13 @@ This links the checkout's command through npm's global executable directory. Use
 | `APPUNPACK_NODE` | Windows launcher's explicit Node executable |
 | `APPUNPACK_JADX_JAR` | Select a custom engine JAR instead of the checkout's default |
 | `APPUNPACK_HEAP_MIB` | Optional maximum Java heap size, in MiB |
-| `APPUNPACK_PYTHON` | Optional Python executable for IPA inventory |
+| `APPUNPACK_PYTHON` | Python executable for archive workflows |
+| `APPUNPACK_APKTOOL_JAR` | Absolute path to a separately installed Apktool 3.0.3+ JAR |
+| `GHIDRA_HOME` | Unpacked Ghidra binary distribution; needs that release's compatible JDK |
+| `APPUNPACK_ADB` | ADB executable; otherwise resolved from PATH |
+| `APPUNPACK_FRIDA` | Frida CLI executable; otherwise resolved from PATH |
+| `APPUNPACK_FRIDA_PS` | Frida process-list executable; otherwise resolved from PATH |
 
 Use absolute executable and JAR paths in agent configurations. `doctor` checks the selected engine setup; it does not prove that every APK will decompile successfully or that a Java runtime has the compiler modules needed for full export.
+
+Optional Apktool, Ghidra, ADB and Frida are installed separately; `install-tools` installs only JADX. See [extended Android setup](android-workflows.md) for commands, tool requirements and limits. The basic APK workflow remains independent of these optional integrations.

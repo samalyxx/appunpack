@@ -19,6 +19,6 @@ jobs:
           python-version: '3.12'
       - run: npm ci
       - run: npm test
-      - run: npm run test:ios
+      - run: npm run test:python
       - run: node bin/appunpack.mjs --help
       - run: npm pack --dry-run

@@ -8,6 +8,16 @@ Run from the checkout with `node bin/appunpack.mjs`, or use `appunpack` after `n
 | `install-tools [DIRECTORY]` | Download and verify the pinned engine JAR |
 | `doctor` | Check Java and JADX engine readiness |
 | `analyze APK [--output NEW_DIRECTORY]` | The same full APK export with an explicit command name |
+| `splits SET --output NEW_DIRECTORY` | Combined analysis of compatible base/split APKs |
+| `decode APK --output NEW_DIRECTORY` | Apktool resource and smali output |
+| `native-libs APK` | List exact native library member paths |
+| `native LIB.so --output NEW_DIRECTORY` | Ghidra pseudocode and function report |
+| `native APK --library MEMBER --output NEW_DIRECTORY` | Extract and analyze a selected native library |
+| `devices` / `packages --device SERIAL` | ADB device/package listing |
+| `pull PACKAGE --device SERIAL --output NEW_DIRECTORY` | Copy base and split APKs from a device |
+| `logcat --device SERIAL --seconds N --output NEW_DIRECTORY` | Bounded device log capture |
+| `frida-ps --device ID` | List Frida processes |
+| `trace PID SCRIPT.js --device ID --seconds N --output NEW_DIRECTORY` | Frida attach with a supplied script |
 | `inspect APK` | Inspect package and manifest metadata |
 | `classes APK QUERY` | Search class names |
 | `class APK FQCN` | Inspect one fully qualified class and its members |
@@ -40,7 +50,7 @@ node bin/appunpack.mjs analyze ./Uber.apk --output ./reports/uber
 
 Both forms require a new destination and refuse to overwrite an existing one. A failed attempt may leave diagnostic or partial files; use a new destination to retry. Keep collected observations and logs with the report. Target files and analysis output can be confidential; keep them out of public commits.
 
-A Play-installed app may consist of a base APK and additional split APKs. One exported file may omit code or resources required for the complete app. This version does not merge splits, unpack `.apks` collections, or turn an AAB into a complete application. Decompiled output cannot recover the app's servers, private backend logic or original source project.
+A Play-installed app may consist of a base APK and additional split APKs. One exported file may omit code or resources required for the complete app. Use `splits` for a compatible base/split set or unambiguous `.apks`/`.xapk` collection. Variant-bearing bundletool archives need device-specific extraction first. This creates combined analysis output, not an installable merged APK, and does not turn an AAB into a complete application. See [extended Android workflows](android-workflows.md). Decompiled output cannot recover the app's servers, private backend logic or original source project.
 
 A manifest reports declarations. A requested permission does not establish that an app exercises that capability. An exported component is a lead for investigation, not an exploitability verdict.
 

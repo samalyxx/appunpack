@@ -9,6 +9,10 @@ AppUnpack's own code is covered by its [MIT license](LICENSE). The tools and lib
 | [MCP TypeScript SDK](https://github.com/modelcontextprotocol/typescript-sdk) | `@modelcontextprotocol/client` 2.3.1: client transport and tool calls from the Node.js CLI | [Apache-2.0 transition with retained MIT contributions](https://github.com/modelcontextprotocol/typescript-sdk/blob/main/LICENSE); preserve the installed package's full `LICENSE` |
 | [Node.js](https://nodejs.org/) | Caller-supplied JavaScript runtime | [Node.js and component licenses](https://github.com/nodejs/node/blob/main/LICENSE) |
 | [Python](https://www.python.org/) | Caller-supplied standard-library ZIP/plist inspection for IPA files | [Python license and component notices](https://docs.python.org/3/license.html) |
+| [Apktool](https://github.com/iBotPeaches/Apktool) | Optional caller-installed resource/smali decoder | [Apache-2.0](https://github.com/iBotPeaches/Apktool/blob/main/LICENSE.md) |
+| [Ghidra](https://github.com/NationalSecurityAgency/ghidra) | Optional caller-installed ELF analysis and decompiler | [Apache-2.0 and component notices](https://github.com/NationalSecurityAgency/ghidra/blob/master/LICENSE) |
+| [Android SDK Platform Tools](https://developer.android.com/tools/releases/platform-tools) | Optional caller-installed ADB device access | The installed SDK distribution's licenses and notices apply |
+| [Frida](https://github.com/frida/frida) / [frida-tools](https://github.com/frida/frida-tools) | Optional caller-installed process instrumentation CLI | [Frida COPYING](https://github.com/frida/frida/blob/main/COPYING), [frida-tools license](https://github.com/frida/frida-tools/blob/main/LICENSE) and bundled component notices |
 
 The repository does not bundle Java, Python, target applications or the engine JAR. `install-tools` downloads the JAR from its upstream release on request and checks its pinned SHA-256. Preserve the release's licenses and component notices if you redistribute that artifact. Java distributions have their own terms.
 

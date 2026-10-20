@@ -4,7 +4,10 @@ reports/
 *-analysis/
 *.apk
 *.apks
+*.xapk
 *.aab
+*.so
+*.dex
 *.ipa
 *.jar
 *.tgz

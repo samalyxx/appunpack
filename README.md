@@ -3,7 +3,7 @@
 **Give it an APK. Get decompiled Java, decoded resources and a local analysis report.**
 
 [![Checks](https://github.com/samalyxx/appunpack/actions/workflows/ci.yml/badge.svg)](https://github.com/samalyxx/appunpack/actions/workflows/ci.yml)
-[![Release v0.1.0](https://img.shields.io/badge/release-v0.1.0-b4f56a)](https://github.com/samalyxx/appunpack/releases/tag/v0.1.0)
+[![Release v0.2.0](https://img.shields.io/badge/release-v0.2.0-b4f56a)](https://github.com/samalyxx/appunpack/releases/tag/v0.2.0)
 [![Node.js 24.11+](https://img.shields.io/badge/Node.js-24.11%2B-79dcb6)](https://nodejs.org/)
 [![MIT license](https://img.shields.io/badge/license-MIT-76d6ed)](LICENSE)
 
@@ -69,11 +69,33 @@ You supply the APK; a name or Play Store link is not an APK. The engine download
 | Class and method investigation | Class search, summaries, source, method bodies and cross-references |
 | AI coding agents | Local Android MCP server and an APK investigation skill |
 | iOS `.ipa` | Static archive and bundle metadata inventory with Python |
-| Split APK sets and Android App Bundles | No split merging or complete AAB analysis |
-| Native libraries and iOS executables | No native executable decompilation workflow |
-| Live app behavior, rebuilding and signing | Outside the current workflow |
+| Split APK sets | Combined JADX analysis of a compatible base/split directory or unambiguous `.apks`/`.xapk`; per-part resources retained |
+| Apktool | Optional resource decoding and smali disassembly |
+| Android native `.so` libraries | Optional Ghidra pseudocode/function reports; direct ELF or a selected APK member |
+| Android devices | ADB device/package listing, base/split pulling and bounded logcat |
+| Running processes | Optional Frida process listing and explicit PID/script capture |
+| AAB variants, rebuilding and signing | No installable APK merging, AAB generation, rebuilding or signing |
+| iOS executables | No iOS executable decompilation workflow |
 
 Static references do not prove that a call occurs at runtime. Reports do not verify APK/IPA signatures or certify that an app is safe.
+
+## Extended Android workflows
+
+These commands use separately installed tools. The basic APK command stays static and needs no device. See [extended setup and commands](docs/android-workflows.md).
+
+```sh
+node bin/appunpack.mjs splits ./apk-set --output ./reports/splits
+node bin/appunpack.mjs decode ./Example.apk --output ./reports/apktool
+node bin/appunpack.mjs native-libs ./Example.apk
+node bin/appunpack.mjs native ./Example.apk --library lib/arm64-v8a/libexample.so --output ./reports/native
+node bin/appunpack.mjs devices
+node bin/appunpack.mjs pull com.example.app --device emulator-5554 --output ./reports/pulled
+node bin/appunpack.mjs logcat --device emulator-5554 --seconds 10 --output ./reports/logs
+node bin/appunpack.mjs frida-ps --device DEVICE_ID
+node bin/appunpack.mjs trace 1234 ./observe.js --device DEVICE_ID --seconds 10 --output ./reports/trace
+```
+
+Split analysis combines the supplied APKs for investigation and saves per-part identities/resources; it does not create an installable merged APK. Runtime commands select an existing device/process explicitly. A Frida script executes inside that process and can change its behavior.
 
 ## Follow the code
 
@@ -153,7 +175,7 @@ The Java engine benefits from desktop memory, an isolated workspace and code nav
 <details>
 <summary><strong>What do I need installed?</strong></summary>
 
-Node.js 24.11 or newer, npm, Git and a Java 17 or newer JDK for full APK export. Python 3.10 or newer is optional and used only for IPA metadata inspection. The setup command downloads and verifies the pinned JADX headless engine. GitHub release archives include source, not these runtimes or the engine JAR.
+Node.js 24.11 or newer, npm, Git and a Java 17 or newer JDK for full APK export. Python 3.10 or newer is needed for IPA, split preparation, APK preflight and native-library extraction; the basic JADX workflow does not need it. The setup command downloads and verifies the pinned JADX headless engine. GitHub release archives include source, not these runtimes or the engine JAR.
 
 </details>
 
@@ -169,6 +191,7 @@ The current installation method is a GitHub source checkout or release archive f
 - [Installation](docs/installation.md): requirements, engine verification and platform setup.
 - [Commands and outputs](docs/usage.md): APK and IPA workflows, flags and report contracts.
 - [AI agent setup](docs/agents.md): local MCP configuration and investigation prompts.
+- [Extended Android workflows](docs/android-workflows.md): split sets, Apktool, Ghidra, ADB and Frida.
 - [Architecture](docs/architecture.md): how the CLI, engine and reports fit together.
 - [Mobile reverse-engineering research](docs/mobile-tooling-research.md): Android and iOS tool comparisons.
 - [Verification](docs/testing.md): reproducible checks, real APK results and limits.

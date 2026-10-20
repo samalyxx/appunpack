@@ -58,3 +58,7 @@ facts from inferences. Do not install, launch or contact the target app.
 ```
 
 Analysis runs on your computer. A cloud agent may receive code, strings, metadata and local paths in tool responses under its own data policy. Review what is sent before using confidential artifacts. IPA inventory is a separate CLI workflow; this initial Android MCP server does not expose it as an iOS analysis tool.
+
+## Optional CLI workflows
+
+The [extended Android commands](android-workflows.md) add split-set analysis, Apktool, Ghidra, ADB and Frida through the CLI. They do not extend the upstream JADX MCP tool list. An agent with terminal access can call them under its normal permissions. Select device IDs/PIDs explicitly; a static inspection request does not authorize device changes or running a Frida script. Frida executes the supplied script inside the target process, so review that script before invocation.

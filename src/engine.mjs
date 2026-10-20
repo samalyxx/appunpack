@@ -1,10 +1,11 @@
 import { spawn } from "node:child_process";
-import { open, readFile, stat } from "node:fs/promises";
+import { readFile, stat } from "node:fs/promises";
 import { isAbsolute, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { Client } from "@modelcontextprotocol/client";
 import { StdioClientTransport } from "@modelcontextprotocol/client/stdio";
 import { JADX, sha256 } from "./tools.mjs";
+import { runTool } from "./process.mjs";
 
 export const root = fileURLToPath(new URL("..", import.meta.url));
 
@@ -12,7 +13,7 @@ export function javaCommand(environment = process.env) {
   return environment.JAVA_HOME ? join(environment.JAVA_HOME, "bin", process.platform === "win32" ? "java.exe" : "java") : "java";
 }
 
-function javaOptions(environment = process.env) {
+export function javaOptions(environment = process.env) {
   const heap = environment.APPUNPACK_HEAP_MIB;
   if (heap !== undefined && (!/^[1-9][0-9]*$/.test(heap) || !Number.isSafeInteger(Number(heap)))) throw new Error("APPUNPACK_HEAP_MIB must be a positive integer in MiB.");
   return [...(heap ? [`-Xmx${heap}m`] : []), "-Dorg.slf4j.simpleLogger.defaultLogLevel=warn"];
@@ -45,7 +46,7 @@ export function toolValue(reply) {
 
 export async function withEngine(apk, callback) {
   const jar = await selectedJar();
-  const client = new Client({ name: "appunpack", version: "0.1.0" });
+  const client = new Client({ name: "appunpack", version: "0.2.0" });
   const transport = new StdioClientTransport({ command: javaCommand(), args: javaArgs(jar), stderr: "inherit" });
   try {
     await client.connect(transport, { timeout: 30_000 });
@@ -65,15 +66,16 @@ export async function withEngine(apk, callback) {
 export async function exportPackage(apk, output) {
   const jar = await selectedJar();
   const logPath = join(output, "decompile.log");
-  const log = await open(logPath, "wx");
+  const inputs = Array.isArray(apk) ? apk : [apk];
+  if (!inputs.length) throw new Error("At least one APK is required.");
   try {
     process.stderr.write(`Decompiling APK. Engine output: ${logPath}\n`);
-    const code = await forwardProcess(javaCommand(), [...javaOptions(), "-cp", jar,
-      join(root, "src", "Export.java"), apk, join(output, "decompiled")], ["ignore", log.fd, log.fd]);
-    if (code !== 0) throw new Error(`Decompilation failed (exit ${code}). See ${logPath}; full export requires a JDK with the jdk.compiler module.`);
+    await runTool(javaCommand(), [...javaOptions(), "-cp", jar,
+      join(root, "src", "Export.java"), inputs[0], join(output, "decompiled"), ...inputs.slice(1)],
+      { timeoutMs: 600_000, maxOutputBytes: 16 * 1024 * 1024, logPath });
     return JSON.parse(await readFile(join(output, "decompiled", "export.json"), "utf8"));
-  } finally {
-    await log.close();
+  } catch (error) {
+    throw new Error(`${error.message}\nSee ${logPath}; full export requires a JDK with the jdk.compiler module.`, { cause: error });
   }
 }
 
