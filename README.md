@@ -1,18 +1,21 @@
-# AppUnpack
+# AppUnpack — Android APK reverse engineering
 
-**Give it an APK. Get decompiled code, decoded resources and a local report.**
+**Give it an APK. Get decompiled Java, decoded resources and a local analysis report.**
 
-AppUnpack runs the [JADX engine](https://github.com/1013503897/jadx-headless-mcp) on your computer. Its default workflow exports an Android APK's decompiled Java and decoded resources, with manifest, evidence and a readable report. You can also inspect individual classes or connect an AI coding agent. A separate Python workflow provides initial iOS IPA inventory.
+[![Checks](https://github.com/samalyxx/appunpack/actions/workflows/ci.yml/badge.svg)](https://github.com/samalyxx/appunpack/actions/workflows/ci.yml)
+[![Release v0.1.0](https://img.shields.io/badge/release-v0.1.0-b4f56a)](https://github.com/samalyxx/appunpack/releases/tag/v0.1.0)
+[![Node.js 24.11+](https://img.shields.io/badge/Node.js-24.11%2B-79dcb6)](https://nodejs.org/)
+[![MIT license](https://img.shields.io/badge/license-MIT-76d6ed)](LICENSE)
 
-[Installation](docs/installation.md) · [Commands](docs/usage.md) · [AI agents](docs/agents.md) · [Android and iOS research](docs/mobile-tooling-research.md) · [Testing](docs/testing.md) · [Security](SECURITY.md)
+[Website](https://samalyxx.github.io/appunpack/) · [Quick start](#quick-start) · [What you get](#what-you-get) · [AI agents](#connect-your-ai-agent) · [FAQ](#faq) · [Documentation](#documentation) · [Releases](https://github.com/samalyxx/appunpack/releases)
 
-## Why run it on a computer?
+![AppUnpack: a local APK becomes decompiled Java, decoded resources and an evidence report.](site/assets/hero.svg)
 
-Desktop analysis gives the Java engine more memory, an isolated workspace and access to coding agents. Static APK analysis does not require installing or launching the app. Runtime investigation on a test phone or emulator can follow when a question needs observed behavior.
+AppUnpack is a local Android APK decompiler and analysis CLI powered by [JADX](https://github.com/skylot/jadx) through [jadx-headless-mcp](https://github.com/1013503897/jadx-headless-mcp). Analyze a file directly, inspect specific classes and methods, or connect an AI coding agent through MCP. A separate Python command inventories iOS IPA metadata.
 
 ## Quick start
 
-Install Git, Node.js 24.11 or newer, npm and a Java 17 or newer **JDK**. Then:
+Install **Git, Node.js 24.11 or newer, npm and a Java 17 or newer JDK**. Full APK export needs the JDK compiler modules. You do not need an Android device or an AI account.
 
 ```sh
 git clone https://github.com/samalyxx/appunpack.git
@@ -20,34 +23,57 @@ cd appunpack
 npm ci
 node bin/appunpack.mjs install-tools
 node bin/appunpack.mjs doctor
-node bin/appunpack.mjs ./Uber.apk
 ```
 
-Replace `./Uber.apk` with the actual APK file you obtained. AppUnpack does not download an app from its name or a Play Store link. It creates a new `Uber-analysis` directory beside the APK and refuses to overwrite an existing directory.
-
-The export runs locally and does not need an AI account.
-
-On Windows, the included launcher also accepts the file directly:
+Then give it an actual APK file. On Windows:
 
 ```powershell
-.\appunpack.ps1 'C:\Apps\Uber.apk'
+.\appunpack.ps1 'C:\Apps\Example.apk'
 ```
 
-The launcher uses `APPUNPACK_NODE`, a portable `.tools/node.exe`, or Node on `PATH`, in that order. It can use Android Studio's bundled Java when `JAVA_HOME` and Java on `PATH` are unavailable. See [installation](docs/installation.md) for runtime setup.
+Or use Node directly on any supported host:
 
-The new report directory contains:
+```sh
+node bin/appunpack.mjs /path/to/Example.apk
+```
 
-| File | Contents |
+AppUnpack creates a new `Example-analysis` directory beside the input APK and refuses to overwrite an existing output directory. Open `report.md`, then browse the recovered files. To choose a destination:
+
+```sh
+node bin/appunpack.mjs analyze /path/to/Example.apk --output ./reports/example
+```
+
+You supply the APK; a name or Play Store link is not an APK. The engine download happens during setup. Analysis runs on your computer. See [installation and Windows setup](docs/installation.md) for runtime selection and launcher troubleshooting.
+
+## What you get
+
+![AppUnpack workflow: choose an APK, inspect and export with the local JADX engine, then read code, resources and evidence.](site/assets/workflow.svg)
+
+| Output | What to open it for |
 | --- | --- |
-| `report.md` | Readable package summary and limitations |
-| `evidence.json` | Collected engine responses and artifact identity |
-| `manifest.xml` | Manifest XML returned by JADX |
-| `decompiled/sources/` | Decompiled Java files |
-| `decompiled/resources/` | Decoded application resources |
-| `decompiled/export.json` | Export counts, errors and completion status |
-| `decompile.log` | Export diagnostics; keep this when output is partial |
+| `decompiled/sources/` | Recovered Java classes and methods |
+| `decompiled/resources/` | Decoded resources, including layouts and strings when available |
+| `manifest.xml` | The manifest XML returned by the engine |
+| `report.md` | Package summary, export status and limitations |
+| `evidence.json` | Input identity and collected engine responses |
+| `decompiled/export.json` | Export counts, errors, warnings and completion status |
+| `decompile.log` | Diagnostics to investigate incomplete output |
 
-Open `report.md` first, then browse `decompiled/sources` and `decompiled/resources`. To choose the destination explicitly, use `node bin/appunpack.mjs analyze ./Uber.apk --output ./reports/uber`.
+**Recovered code is a derived view.** It is not the original Java/Kotlin project, a guaranteed buildable app or the application's backend. Obfuscation and decompilation errors can leave gaps even when many useful files are exported.
+
+## Scope
+
+| Target or workflow | Current support |
+| --- | --- |
+| Android `.apk` | Decompiled Java, decoded resources, manifest and evidence report |
+| Class and method investigation | Class search, summaries, source, method bodies and cross-references |
+| AI coding agents | Local Android MCP server and an APK investigation skill |
+| iOS `.ipa` | Static archive and bundle metadata inventory with Python |
+| Split APK sets and Android App Bundles | No split merging or complete AAB analysis |
+| Native libraries and iOS executables | No native executable decompilation workflow |
+| Live app behavior, rebuilding and signing | Outside the current workflow |
+
+Static references do not prove that a call occurs at runtime. Reports do not verify APK/IPA signatures or certify that an app is safe.
 
 ## Follow the code
 
@@ -60,7 +86,7 @@ node bin/appunpack.mjs references ./Example.apk com.example.MainActivity --metho
 node bin/appunpack.mjs resources ./Example.apk --query title
 ```
 
-Use the class result to select an overloaded method. [Command details](docs/usage.md) explain results and limits.
+These commands return JSON. Use the class summary to select an overloaded method, then pass its index with `--overload-index`. See the [command reference](docs/usage.md).
 
 ## Connect your AI agent
 
@@ -68,29 +94,93 @@ Use the class result to select an overloaded method. [Command details](docs/usag
 node bin/appunpack.mjs mcp-config
 ```
 
-Review the printed configuration and add it to your client's MCP settings. The server launches the Android JADX engine directly over stdio. The [APK analysis skill](skills/apk-analysis/SKILL.md) gives an agent a focused investigation workflow. See [agent setup](docs/agents.md) for Codex and generic clients.
+Review the printed JSON and add it to your client's MCP settings. The server starts the Android engine directly over local stdio. [Agent setup](docs/agents.md) covers configuration, and the [APK analysis skill](skills/apk-analysis/SKILL.md) supplies a focused investigation workflow.
 
 Example prompt:
 
-> Inspect this APK's manifest, find the implementation behind its search screen, then trace the relevant classes, methods and callers. Include the APK hash, evidence and limits. Separate observed facts from inferences.
+> Inspect this APK's manifest, find the implementation behind its search screen, and trace the relevant classes, methods and callers. Include the APK hash, evidence and limitations. Separate observed facts from inferences.
+
+The CLI does not require an AI account. If you connect a cloud AI client, the tool output it requests can be sent to that provider under the client's own data policy.
+
+## Checked against real APKs
+
+![Illustrated Appium ApiDemos export: recovered files and a Java method alongside a partial status, 88 errors and 10 warnings.](site/assets/evidence.svg)
+
+Three public APK fixtures were processed locally. All produced source, resources and reports; all reported a **partial** export. One recovered sieve algorithm was also compared against its original source and an independent check for six inputs.
+
+The [verification record](docs/testing.md) includes fixture identities, hashes, error counts, test coverage and what was not checked. GitHub Actions runs the unit/parser checks on Windows and Ubuntu; that CI matrix does not run target Android apps.
 
 ## Initial iOS support
 
-With Python 3.10 or newer installed:
+Install Python 3.10 or newer, then:
 
 ```sh
 node bin/appunpack.mjs ipa ./Example.ipa --output ./reports/ios-example
 ```
 
-This workflow inventories the IPA archive and bundle metadata. Executable decompilation, FairPlay decryption and iOS runtime analysis are outside its scope. See [IPA usage](docs/usage.md#inspect-an-ipa).
+This inventories the IPA archive and readable bundle metadata. Executable decompilation, FairPlay decryption and iOS runtime analysis are outside its scope. See [IPA usage](docs/usage.md#inspect-an-ipa).
 
-## What the results mean
+## FAQ
 
-- Decompiled Java is a derived view. It does not recover the original Kotlin/Java project, backend services or a guaranteed buildable reconstruction.
-- Static references and manifest declarations do not establish runtime calls or vulnerability exploitability.
-- Reports do not validate APK/IPA signatures or certify an application as safe.
-- Obfuscation, missing splits, native code and engine limits can leave gaps. This version does not merge split APKs or analyze AABs as complete applications.
-- Java processes target files with your user permissions. Use an isolated environment for unfamiliar APKs.
-- Processing is local. A cloud AI client can receive the tool output it requests under that client's own data policy.
+<details>
+<summary><strong>Does AppUnpack upload my APK?</strong></summary>
 
-The implementation is [MIT licensed](LICENSE). JADX, jadx-headless-mcp, the MCP SDK and other dependencies retain their own licenses. See [third-party notices](THIRD_PARTY_NOTICES.md).
+The built-in CLI processes the target locally. Setup downloads the engine and npm dependencies. A connected cloud AI client can send requested tool results to its provider; review that client's settings before connecting sensitive targets.
+
+</details>
+
+<details>
+<summary><strong>Will it recover the exact original app?</strong></summary>
+
+No. JADX reconstructs Java from compiled Android bytecode. Original Kotlin, comments, meaningful obfuscated names, build configuration, missing split modules and server-side code cannot be assumed recoverable. Native libraries require a separate investigation. Exported files may need manual interpretation and correction.
+
+</details>
+
+<details>
+<summary><strong>What does a partial export mean?</strong></summary>
+
+The engine reported errors or warnings while exporting. Useful files may still exist. Read `decompiled/export.json` and `decompile.log`, and check the specific method or resource you need. A large file count is not evidence that every method was recovered correctly.
+
+</details>
+
+<details>
+<summary><strong>Why analyze an Android app on a computer?</strong></summary>
+
+The Java engine benefits from desktop memory, an isolated workspace and code navigation tools. Static analysis does not require installing or launching the APK. Use a test device or emulator separately when a question requires observed runtime behavior.
+
+</details>
+
+<details>
+<summary><strong>What do I need installed?</strong></summary>
+
+Node.js 24.11 or newer, npm, Git and a Java 17 or newer JDK for full APK export. Python 3.10 or newer is optional and used only for IPA metadata inspection. The setup command downloads and verifies the pinned JADX headless engine. GitHub release archives include source, not these runtimes or the engine JAR.
+
+</details>
+
+<details>
+<summary><strong>Can I install it with npx?</strong></summary>
+
+The current installation method is a GitHub source checkout or release archive followed by `npm ci`. There is no published AppUnpack npm release. You can run `npm link` from an installed checkout if you want an `appunpack` command on your PATH.
+
+</details>
+
+## Documentation
+
+- [Installation](docs/installation.md): requirements, engine verification and platform setup.
+- [Commands and outputs](docs/usage.md): APK and IPA workflows, flags and report contracts.
+- [AI agent setup](docs/agents.md): local MCP configuration and investigation prompts.
+- [Architecture](docs/architecture.md): how the CLI, engine and reports fit together.
+- [Mobile reverse-engineering research](docs/mobile-tooling-research.md): Android and iOS tool comparisons.
+- [Verification](docs/testing.md): reproducible checks, real APK results and limits.
+- [Website and search visibility](docs/seo.md): public metadata and Google Search Console steps.
+- [Changelog](CHANGELOG.md) and [GitHub releases](https://github.com/samalyxx/appunpack/releases).
+
+## Contributing and responsible use
+
+Report reproducible bugs through [GitHub issues](https://github.com/samalyxx/appunpack/issues). Include the command, runtime versions and sanitized diagnostics; keep private APKs and secrets out of public reports. See [contributing](CONTRIBUTING.md) and [security guidance](SECURITY.md).
+
+Analyze software you own or are authorized to examine. Unfamiliar target files are parsed by Java with your user permissions; use an isolated environment.
+
+## License
+
+AppUnpack's code is [MIT licensed](LICENSE). JADX, jadx-headless-mcp, the MCP SDK and other dependencies retain their own licenses and notices. See [third-party notices](THIRD_PARTY_NOTICES.md). Integration names identify those projects and do not imply endorsement.

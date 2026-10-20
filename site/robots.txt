@@ -1,0 +1,6 @@
+# GitHub project Pages serves this file below /appunpack/.
+# Host-level crawler rules belong at https://samalyxx.github.io/robots.txt.
+User-agent: *
+Allow: /
+
+Sitemap: https://samalyxx.github.io/appunpack/sitemap.xml

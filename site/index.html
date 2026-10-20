@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AppUnpack — Android APK reverse engineering with JADX</title>
+  <meta name="description" content="Reverse engineer Android APKs locally with AppUnpack. Export decompiled Java, decoded resources, manifests and evidence reports, or connect your AI agent through MCP.">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <meta name="theme-color" content="#0b1017">
+  <link rel="canonical" href="https://samalyxx.github.io/appunpack/">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="AppUnpack">
+  <meta property="og:title" content="AppUnpack — Android APK reverse engineering">
+  <meta property="og:description" content="One APK. Decompiled code, decoded resources and evidence. A local CLI built on JADX, with optional AI-agent integration.">
+  <meta property="og:url" content="https://samalyxx.github.io/appunpack/">
+  <meta property="og:image" content="https://samalyxx.github.io/appunpack/assets/social-card.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="AppUnpack: Android APK reverse engineering. One APK. Code, resources, evidence.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="AppUnpack — Android APK reverse engineering">
+  <meta name="twitter:description" content="Export Java, resources and a local evidence report from an Android APK.">
+  <meta name="twitter:image" content="https://samalyxx.github.io/appunpack/assets/social-card.png">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "AppUnpack",
+    "url": "https://samalyxx.github.io/appunpack/",
+    "description": "A local Android APK reverse-engineering CLI that exports decompiled Java, decoded resources, manifests and evidence reports using JADX.",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "Windows, Linux, macOS",
+    "softwareRequirements": "Node.js 24.11 or newer; Java 17 or newer JDK with compiler modules. Python 3.10 or newer for optional IPA metadata inspection.",
+    "softwareVersion": "0.1.0",
+    "license": "https://github.com/samalyxx/appunpack/blob/main/LICENSE",
+    "downloadUrl": "https://github.com/samalyxx/appunpack/releases/tag/v0.1.0",
+    "image": "https://samalyxx.github.io/appunpack/assets/social-card.png",
+    "author": { "@type": "Person", "name": "samalyxx", "url": "https://github.com/samalyxx" },
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+  }
+  </script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header wrap">
+    <a class="brand" href="./" aria-label="AppUnpack home"><img src="assets/favicon.svg" width="34" height="34" alt="">AppUnpack<span class="version">v0.1.0</span></a>
+    <nav aria-label="Main navigation"><a href="#how-it-works">How it works</a><a href="#quick-start">Get started</a><a href="#faq">FAQ</a><a class="nav-github" href="https://github.com/samalyxx/appunpack">GitHub <span aria-hidden="true">↗</span></a></nav>
+  </header>
+  <main id="main">
+    <section class="hero wrap">
+      <div class="hero-copy">
+        <p class="eyebrow"><span class="status-dot"></span> OPEN SOURCE · LOCAL ANALYSIS · MIT</p>
+        <h1>Android APK<br>reverse engineering.<br><span>Unpack the evidence.</span></h1>
+        <p class="intro">Give AppUnpack an APK. Get readable Java, decoded resources and a report that keeps the evidence and its limits together.</p>
+        <div class="actions"><a class="button primary" href="#quick-start">Start with your APK <span aria-hidden="true">↘</span></a><a class="button secondary" href="https://github.com/samalyxx/appunpack/releases/tag/v0.1.0">Download v0.1.0 <span aria-hidden="true">↗</span></a></div>
+        <p class="micro">Runs on your computer. No AI account required.</p>
+      </div>
+      <div class="terminal" aria-label="Illustration of the local APK command and resulting files">
+        <div class="terminal-bar"><span class="dots" aria-hidden="true">● ● ●</span><span>YOUR COMPUTER / TERMINAL</span><span class="live-label">LOCAL</span></div>
+        <div class="terminal-body"><p class="prompt"><span>$</span> node bin/appunpack.mjs Example.apk</p><p class="terminal-muted">Decompiling APK…</p><p><span class="terminal-green">↳</span> Example-analysis/</p><ul class="file-tree"><li><span>├─</span> decompiled/sources/ <em>Java</em></li><li><span>├─</span> decompiled/resources/ <em>XML + assets</em></li><li><span>├─</span> manifest.xml</li><li><span>├─</span> evidence.json <em>SHA-256 + results</em></li><li><span>├─</span> decompile.log</li><li><span>└─</span> report.md <em>Start here</em></li></ul><div class="terminal-note"><span aria-hidden="true">◈</span> Partial results stay visible.<br><span>Errors, warnings and unknowns are part of the output.</span></div></div>
+        <div class="terminal-footer">ILLUSTRATED WORKFLOW <span>JADX ENGINE</span></div>
+      </div>
+    </section>
+    <div class="proof-strip wrap"><span>BUILT ON <strong>JADX</strong></span><span>CLI + <strong>MCP</strong></span><span>EXPORTS <strong>Code + resources</strong></span><span>KEEPS <strong>Hashes + diagnostics</strong></span></div>
+    <section class="section wrap" id="how-it-works">
+      <div class="section-heading"><div><p class="eyebrow">01 / THE WORKFLOW</p><h2>One input. Files you can inspect.</h2></div><p>AppUnpack calls the established JADX engine and saves the results in a new folder. Your APK is processed without installing or launching the app.</p></div>
+      <img class="diagram" src="assets/workflow.svg" alt="Local APK workflow: provide an APK, process it with JADX, then inspect decompiled Java, resources, manifest, evidence and report. Partial status is retained." width="1440" height="480" loading="lazy">
+      <div class="feature-grid"><article><span class="feature-number">01</span><h3>Read the recovered code</h3><p>Export reconstructed Java and search classes, methods and references. Follow the implementation behind a feature.</p></article><article><span class="feature-number">02</span><h3>Inspect what ships</h3><p>Browse decoded resources and manifest declarations. Keep the package identity, permissions and observed metadata.</p></article><article><span class="feature-number">03</span><h3>Keep the evidence</h3><p>Every report retains the input SHA-256, engine identity and diagnostics. Existing output directories are preserved.</p></article></div>
+    </section>
+    <section class="section example-section" id="example"><div class="wrap">
+      <div class="section-heading"><div><p class="eyebrow">02 / VERIFIED OUTPUT</p><h2>Actual tests. Honest coverage.</h2></div><p>Three public APKs were processed on Windows. A recovered algorithm also matched its original implementation and an independent correctness check for six inputs.</p></div>
+      <img class="evidence-visual" src="assets/evidence.svg" alt="Illustration based on verified ApiDemos output: 2,860 Java files, 978 resource files, partial export with 88 errors and 10 warnings." width="1440" height="850" loading="lazy">
+      <div class="example-caption"><p><strong>These are derived files, not the original project.</strong> Decompiled methods can be incomplete or inaccurate. The illustration above summarizes a real test; it is not a product GUI.</p><a href="https://github.com/samalyxx/appunpack/blob/main/docs/testing.md">Read the verification record <span aria-hidden="true">↗</span></a></div>
+    </div></section>
+    <section class="section wrap" id="quick-start">
+      <div class="section-heading"><div><p class="eyebrow">03 / QUICK START</p><h2>Your APK. Your workspace.</h2></div><p>Install Node.js 24.11+, npm, Git and a Java 17+ JDK with compiler modules. Python 3.10+ is optional for IPA metadata.</p></div>
+      <div class="start-grid"><div class="code-panel"><div class="panel-label">INSTALL FROM SOURCE</div><pre><code>git clone https://github.com/samalyxx/appunpack.git
+cd appunpack
+npm ci
+node bin/appunpack.mjs install-tools
+node bin/appunpack.mjs ./Example.apk</code></pre><p>The engine download is pinned and SHA-256 verified. Replace <code>Example.apk</code> with your APK's path.</p></div><div class="start-note"><h3>On Windows</h3><pre><code>.\appunpack.ps1 'C:\Apps\Example.apk'</code></pre><p>Open <code>Example-analysis/report.md</code> beside your APK, then explore its <code>decompiled</code> folder.</p><p>An existing analysis folder is never overwritten. Choose a new destination with <code>--output</code>.</p><a class="text-link" href="https://github.com/samalyxx/appunpack/blob/main/docs/installation.md">Installation and troubleshooting <span aria-hidden="true">↗</span></a></div></div>
+    </section>
+    <section class="agent-section wrap" id="agents"><div><p class="eyebrow">OPTIONAL / AI CODING AGENTS</p><h2>Ask a question.<br>Trace the implementation.</h2><p>Connect a compatible MCP client to inspect classes, methods and references. Keep the APK hash and distinguish returned evidence from the agent's interpretation.</p><a class="text-link" href="https://github.com/samalyxx/appunpack/blob/main/docs/agents.md">Connect your agent <span aria-hidden="true">↗</span></a></div><div class="agent-code"><p class="panel-label">PRINT YOUR LOCAL MCP CONFIGURATION</p><pre><code>node bin/appunpack.mjs mcp-config</code></pre><blockquote>“Find the search implementation in this APK. Trace its callers and explain the behavior with evidence and limitations.”</blockquote><p class="micro">A cloud AI client can receive the tool output it requests under that client's own data policy.</p></div></section>
+    <section class="section wrap" id="coverage"><div class="section-heading"><div><p class="eyebrow">04 / COVERAGE</p><h2>Know what you're getting.</h2></div><p>Static APK reverse engineering is a starting point for investigation. AppUnpack makes the boundaries visible.</p></div><div class="table-scroll"><table><caption class="sr-only">AppUnpack analysis capabilities and current limits</caption><thead><tr><th scope="col">Target or workflow</th><th scope="col">Current support</th><th scope="col">What to expect</th></tr></thead><tbody><tr><th scope="row">Android APK</th><td><span class="tag supported">Supported</span></td><td>Derived Java, decoded resources, manifest, evidence and report.</td></tr><tr><th scope="row">Class / method investigation</th><td><span class="tag supported">Supported</span></td><td>CLI queries and optional stdio MCP integration through JADX.</td></tr><tr><th scope="row">iOS IPA</th><td><span class="tag limited">Metadata only</span></td><td>Archive and bundle plist inventory; no executable decompilation.</td></tr><tr><th scope="row">Native libraries / runtime / splits</th><td><span class="tag">Outside current scope</span></td><td>No native-body analysis, live instrumentation or split-package merging.</td></tr></tbody></table></div></section>
+    <section class="section faq-section wrap" id="faq"><div><p class="eyebrow">05 / COMMON QUESTIONS</p><h2>Before you unpack.</h2></div><div class="faqs">
+      <details><summary>Is this a real APK decompiler?</summary><p>AppUnpack uses JADX's decompiler API to load APK bytecode and save reconstructed Java and decoded resources. It adds a local command, evidence reports and optional agent integration. It does not implement a new decompiler.</p></details>
+      <details><summary>Can it recover 100% of an app?</summary><p>No. Obfuscation, unsupported constructs, native libraries and missing modules can leave gaps. Even output without reported errors is not proof of correct source recovery. The original source project and server-side backend cannot be recovered from an APK.</p></details>
+      <details><summary>Does my APK get uploaded?</summary><p>The default export runs on your computer. No AI account is required. Setup downloads dependencies and the engine; it does not upload your APK. If you connect a cloud AI client, tool responses follow that client's data policy.</p></details>
+      <details><summary>Can I give it an app name or Play Store link?</summary><p>Provide an actual APK file that you are authorized to analyze. AppUnpack does not download apps by name or merge Play Store split APKs. A lone base APK may omit code and resources.</p></details>
+      <details><summary>What does “partial” mean?</summary><p>The engine reported errors or warnings. Useful files may still exist. Review the counters, affected source files and <code>decompile.log</code> before relying on a result.</p></details>
+      <details><summary>Is this an online APK analyzer?</summary><p>No. This website explains the tool and links to its source release. Analysis happens in your local CLI; there is no APK upload form or hosted analysis service.</p></details>
+    </div></section>
+    <section class="closing wrap"><div><p class="eyebrow">OPEN SOURCE / MIT LICENSE</p><h2>Start with a file.<br>Follow the evidence.</h2></div><a class="button primary" href="https://github.com/samalyxx/appunpack/releases/tag/v0.1.0">Get AppUnpack v0.1.0 <span aria-hidden="true">↗</span></a></section>
+  </main>
+  <footer class="site-footer wrap"><div class="footer-brand"><strong>AppUnpack</strong><p>Local Android APK reverse engineering.<br>Built on JADX. Made by <a href="https://github.com/samalyxx">samalyxx</a>.</p></div><nav aria-label="Footer navigation"><a href="https://github.com/samalyxx/appunpack">Source</a><a href="https://github.com/samalyxx/appunpack/releases">Releases</a><a href="https://github.com/samalyxx/appunpack/blob/main/docs/usage.md">Documentation</a><a href="https://github.com/samalyxx/appunpack/issues">Report an issue</a><a href="https://github.com/samalyxx/appunpack/blob/main/THIRD_PARTY_NOTICES.md">Licenses</a></nav><p class="footer-note">Use on software you own or are authorized to examine. Third-party tools retain their licenses. Website content is static; no analytics or remote fonts.</p></footer>
+</body>
+</html>
