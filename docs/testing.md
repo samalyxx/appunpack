@@ -37,7 +37,7 @@ On Windows x64 with Node 24.19.0, Java 21.0.6 and Python 3.12.6:
 
 - 17 Node unit tests passed.
 - 3 real Android integration workflows passed with the fixed ApiDemos fixture and verified JADX 0.7.1 JAR.
-- 8 synthetic IPA/parser tests passed.
+- 9 synthetic IPA/parser tests passed.
 - The sample report retained a 155,809-character manifest ending in `</manifest>`, and reported 2,876 classes and 869 resources.
 - Package inspection excluded target files, JARs, dependencies and Python bytecode caches.
 

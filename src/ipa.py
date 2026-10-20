@@ -189,10 +189,11 @@ def bundle_metadata(archive, info, kind, remaining):
     elif executable:
         warnings.append("CFBundleExecutable is not a safe single filename; no executable path was derived.")
     url_types = metadata.get("CFBundleURLTypes", [])
+    malformed_url_types = not isinstance(url_types, list)
     if isinstance(url_types, list):
         seen_schemes = set()
         for url_type in url_types:
-            schemes = url_type.get("CFBundleURLSchemes", []) if isinstance(url_type, dict) else []
+            schemes = url_type.get("CFBundleURLSchemes", []) if isinstance(url_type, dict) else None
             if isinstance(schemes, list):
                 for scheme in schemes:
                     value = text(scheme, "CFBundleURLSchemes", warnings, text_budget)
@@ -202,10 +203,14 @@ def bundle_metadata(archive, info, kind, remaining):
                             break
                         result["url_schemes"].append(value)
                         seen_schemes.add(value)
+            else:
+                malformed_url_types = True
             if len(seen_schemes) >= 256:
                 if len(warnings) < 32:
                     warnings.append("URL scheme inspection stops at 256 unique declarations.")
                 break
+    if malformed_url_types:
+        warnings.append("URL scheme inventory is partial: a URL declaration has an invalid structure.")
     for key, value in metadata.items():
         if isinstance(key, str) and len(key) <= 256 and key.startswith("NS") and key.endswith("UsageDescription"):
             if len(result["usage_descriptions"]) >= 256:
@@ -311,7 +316,8 @@ def report_lines(evidence):
                            ("Build", "build"), ("Minimum OS", "minimum_os")):
             yield f"{label}: {escape_markdown(bundle[key])}\n"
         schemes = ", ".join(escape_markdown(value) for value in bundle["url_schemes"])
-        missing = "None declared in readable metadata" if bundle["info_plist"]["status"] == "parsed" else "Unknown"
+        complete = bundle["info_plist"]["status"] == "parsed" and not bundle["info_plist"].get("warnings")
+        missing = "None declared in readable metadata" if complete else "Unknown"
         yield f"URL schemes: {schemes or missing}\n"
         for key, value in bundle["usage_descriptions"].items():
             yield f"{escape_markdown(key)}: {escape_markdown(value)}\n"

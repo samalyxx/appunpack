@@ -88,6 +88,18 @@ class IpaInspectionTests(unittest.TestCase):
                 self.assertIsNone(app["identifier"])
                 self.assertIn("reason", app["info_plist"])
 
+    def test_malformed_url_declarations_remain_explicitly_unknown(self):
+        for declarations in ("invalid", [42], [{"CFBundleURLSchemes": "invalid"}],
+                             [{"CFBundleURLSchemes": [42]}]):
+            with self.subTest(declarations=declarations):
+                metadata = self.metadata(CFBundleURLTypes=declarations)
+                path = self.archive([("Payload/Sample.app/Info.plist", plistlib.dumps(metadata))])
+                evidence = ipa.inspect_ipa(path)
+                self.assertTrue(evidence["bundles"][0]["info_plist"]["warnings"])
+                report = "\n".join(ipa.report_lines(evidence))
+                self.assertIn("URL schemes: Unknown", report)
+                self.assertNotIn("None declared", report)
+
     def test_rejects_unsafe_and_duplicate_archive_paths(self):
         for name in ("../outside", "/absolute", "Payload/../outside", "Payload\\outside", "C:/outside", "nul\x00suffix"):
             with self.subTest(name=name):
