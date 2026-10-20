@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.1 — 2026-10-21
+
+- Accept valid case-distinct resource paths during native inventory, exact-member extraction and opaque split APK copying. Continue rejecting exact duplicate entries and unsafe whole-archive extraction collisions.
+- Add opt-in regression checks for a Jellyfin production-bundle split set and actual Android Frida attachment, plus an automated real JADX integration workflow on Ubuntu.
+- Record release-derived split installation/pulling, minified NetGuard/Mullvad exports and production native-library results. Keep partial statuses and the Android-first/iOS-metadata boundary explicit.
+
 ## 0.2.0 — 2026-10-20
 
 - Analyze compatible base/split APK directories and unambiguous `.apks`/`.xapk` archives together with JADX. Record per-part identities/hashes and retain each part's decoded resources. Refuse ambiguous bundletool variants and mismatched sets.

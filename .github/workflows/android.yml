@@ -1,0 +1,51 @@
+name: Real Android checks
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'tests/integration/**'
+      - '.github/workflows/android.yml'
+  pull_request:
+    paths:
+      - 'src/**'
+      - 'tests/integration/**'
+      - '.github/workflows/android.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  jadx:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: npm ci
+      - name: Download and verify the pinned engine
+        run: node bin/appunpack.mjs install-tools
+      - name: Download and verify the public APK fixture
+        env:
+          APK: ${{ runner.temp }}/ApiDemos-debug.apk
+        run: |
+          curl --fail --location --retry 3 --output "$APK" https://github.com/appium/android-apidemos/releases/download/v6.0.18/ApiDemos-debug.apk
+          echo "a9eecf37b26cd084855c530db81c2bb1b91f4c1b095a04f47aa7c20e2791f686  $APK" | sha256sum --check
+      - name: Exercise real JADX export, queries, MCP and split parsing
+        env:
+          APPUNPACK_TEST_APK: ${{ runner.temp }}/ApiDemos-debug.apk
+          APPUNPACK_JADX_JAR: ${{ github.workspace }}/.tools/jadx-headless-mcp-0.7.1-all.jar
+          APPUNPACK_HEAP_MIB: '1024'
+        run: node --test tests/integration/apk.test.mjs tests/integration/splits.test.mjs

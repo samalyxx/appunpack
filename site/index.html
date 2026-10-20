@@ -33,9 +33,9 @@
     "applicationCategory": "DeveloperApplication",
     "operatingSystem": "Windows, Linux, macOS",
     "softwareRequirements": "Node.js 24.11 or newer; Java 17 or newer JDK with compiler modules. Python 3.10 or newer for optional IPA metadata inspection.",
-    "softwareVersion": "0.2.0",
+    "softwareVersion": "0.2.1",
     "license": "https://github.com/samalyxx/appunpack/blob/main/LICENSE",
-    "downloadUrl": "https://github.com/samalyxx/appunpack/releases/tag/v0.2.0",
+    "downloadUrl": "https://github.com/samalyxx/appunpack/releases/tag/v0.2.1",
     "image": "https://samalyxx.github.io/appunpack/assets/social-card.png",
     "author": { "@type": "Person", "name": "samalyxx", "url": "https://github.com/samalyxx" },
     "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
@@ -45,7 +45,7 @@
 <body>
   <a class="skip" href="#main">Skip to content</a>
   <header class="site-header wrap">
-    <a class="brand" href="./" aria-label="AppUnpack home"><img src="assets/favicon.svg" width="34" height="34" alt="">AppUnpack<span class="version">v0.2.0</span></a>
+    <a class="brand" href="./" aria-label="AppUnpack home"><img src="assets/favicon.svg" width="34" height="34" alt="">AppUnpack<span class="version">v0.2.1</span></a>
     <nav aria-label="Main navigation"><a href="#how-it-works">How it works</a><a href="#quick-start">Get started</a><a href="#faq">FAQ</a><a class="nav-github" href="https://github.com/samalyxx/appunpack">GitHub <span aria-hidden="true">↗</span></a></nav>
   </header>
   <main id="main">
@@ -54,7 +54,7 @@
         <p class="eyebrow"><span class="status-dot"></span> OPEN SOURCE · LOCAL ANALYSIS · MIT</p>
         <h1>Android APK<br>reverse engineering.<br><span>Unpack the evidence.</span></h1>
         <p class="intro">Give AppUnpack an APK. Get readable Java, decoded resources and a report that keeps the evidence and its limits together.</p>
-        <div class="actions"><a class="button primary" href="#quick-start">Start with your APK <span aria-hidden="true">↘</span></a><a class="button secondary" href="https://github.com/samalyxx/appunpack/releases/tag/v0.2.0">Download v0.2.0 <span aria-hidden="true">↗</span></a></div>
+        <div class="actions"><a class="button primary" href="#quick-start">Start with your APK <span aria-hidden="true">↘</span></a><a class="button secondary" href="https://github.com/samalyxx/appunpack/releases/tag/v0.2.1">Download v0.2.1 <span aria-hidden="true">↗</span></a></div>
         <p class="micro">Runs on your computer. No AI account required.</p>
       </div>
       <div class="terminal" aria-label="Illustration of the local APK command and resulting files">
@@ -70,7 +70,7 @@
       <div class="feature-grid"><article><span class="feature-number">01</span><h3>Read the recovered code</h3><p>Export reconstructed Java and search classes, methods and references. Follow the implementation behind a feature.</p></article><article><span class="feature-number">02</span><h3>Inspect what ships</h3><p>Browse decoded resources and manifest declarations. Keep the package identity, permissions and observed metadata.</p></article><article><span class="feature-number">03</span><h3>Keep the evidence</h3><p>Every report retains the input SHA-256, engine identity and diagnostics. Existing output directories are preserved.</p></article></div>
     </section>
     <section class="section example-section" id="example"><div class="wrap">
-      <div class="section-heading"><div><p class="eyebrow">02 / VERIFIED OUTPUT</p><h2>Actual tests. Honest coverage.</h2></div><p>Three public APKs were processed on Windows. A recovered algorithm also matched its original implementation and an independent correctness check for six inputs.</p></div>
+      <div class="section-heading"><div><p class="eyebrow">02 / VERIFIED OUTPUT</p><h2>Actual tests. Honest coverage.</h2></div><p>Public fixtures, NetGuard and Mullvad releases, Jellyfin release-derived split APKs and Android Frida were checked on Windows. Exports retain partial status and diagnostics. See the verification record for exact coverage.</p></div>
       <img class="evidence-visual" src="assets/evidence.svg" alt="Illustration based on verified ApiDemos output: 2,860 Java files, 978 resource files, partial export with 88 errors and 10 warnings." width="1440" height="850" loading="lazy">
       <div class="example-caption"><p><strong>These are derived files, not the original project.</strong> Decompiled methods can be incomplete or inaccurate. The illustration above summarizes a real test; it is not a product GUI.</p><a href="https://github.com/samalyxx/appunpack/blob/main/docs/testing.md">Read the verification record <span aria-hidden="true">↗</span></a></div>
     </div></section>
@@ -92,7 +92,7 @@ node bin/appunpack.mjs ./Example.apk</code></pre><p>The engine download is pinne
       <details><summary>What does “partial” mean?</summary><p>The engine reported errors or warnings. Useful files may still exist. Review the counters, affected source files and <code>decompile.log</code> before relying on a result.</p></details>
       <details><summary>Is this an online APK analyzer?</summary><p>No. This website explains the tool and links to its source release. Analysis happens in your local CLI; there is no APK upload form or hosted analysis service.</p></details>
     </div></section>
-    <section class="closing wrap"><div><p class="eyebrow">OPEN SOURCE / MIT LICENSE</p><h2>Start with a file.<br>Follow the evidence.</h2></div><a class="button primary" href="https://github.com/samalyxx/appunpack/releases/tag/v0.2.0">Get AppUnpack v0.2.0 <span aria-hidden="true">↗</span></a></section>
+    <section class="closing wrap"><div><p class="eyebrow">OPEN SOURCE / MIT LICENSE</p><h2>Start with a file.<br>Follow the evidence.</h2></div><a class="button primary" href="https://github.com/samalyxx/appunpack/releases/tag/v0.2.1">Get AppUnpack v0.2.1 <span aria-hidden="true">↗</span></a></section>
   </main>
   <footer class="site-footer wrap"><div class="footer-brand"><strong>AppUnpack</strong><p>Local Android APK reverse engineering.<br>Built on JADX. Made by <a href="https://github.com/samalyxx">samalyxx</a>.</p></div><nav aria-label="Footer navigation"><a href="https://github.com/samalyxx/appunpack">Source</a><a href="https://github.com/samalyxx/appunpack/releases">Releases</a><a href="https://github.com/samalyxx/appunpack/blob/main/docs/usage.md">Documentation</a><a href="https://github.com/samalyxx/appunpack/issues">Report an issue</a><a href="https://github.com/samalyxx/appunpack/blob/main/THIRD_PARTY_NOTICES.md">Licenses</a></nav><p class="footer-note">Use on software you own or are authorized to examine. Third-party tools retain their licenses. Website content is static; no analytics or remote fonts.</p></footer>
 </body>

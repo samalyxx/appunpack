@@ -62,7 +62,7 @@ export function parseCommand(args) {
 export async function main(args) {
   let [command, ...rest] = args;
   if (!command || ["--help", "-h", "help"].includes(command)) { process.stdout.write(HELP); return 0; }
-  if (command === "--version") { process.stdout.write("appunpack 0.2.0\n"); return 0; }
+  if (command === "--version") { process.stdout.write("appunpack 0.2.1\n"); return 0; }
   if (command === "install-tools") {
     if (rest.length > 1 || rest[0]?.startsWith("-")) throw new Error("Usage: install-tools [DIRECTORY]");
     process.stdout.write(`Verified JADX: ${await installTools(rest[0] ?? join(root, ".tools"))}\n`);

@@ -55,7 +55,7 @@ export async function decodeApk(apk, outputDirectory, environment = process.env,
   const input = await inputFile(apk);
   const jar = await configuredFile("APPUNPACK_APKTOOL_JAR", environment);
   const jarDigest = await sha256(jar);
-  const archive = await nativeLibraries(input.path, environment, run);
+  const archive = await archiveTool(["check-decode", input.path], environment, run);
   const output = resolve(outputDirectory);
   await newOutput(output);
   const version = (await run(javaCommand(environment), ["-jar", jar, "--version"], { env: environment,

@@ -5,6 +5,7 @@ Keep changes focused on inspecting an APK and understanding its evidence. Reuse 
 ```sh
 npm ci
 npm test
+npm run test:python
 node bin/appunpack.mjs --help
 ```
 

@@ -3,7 +3,7 @@
 **Give it an APK. Get decompiled Java, decoded resources and a local analysis report.**
 
 [![Checks](https://github.com/samalyxx/appunpack/actions/workflows/ci.yml/badge.svg)](https://github.com/samalyxx/appunpack/actions/workflows/ci.yml)
-[![Release v0.2.0](https://img.shields.io/badge/release-v0.2.0-b4f56a)](https://github.com/samalyxx/appunpack/releases/tag/v0.2.0)
+[![Release v0.2.1](https://img.shields.io/badge/release-v0.2.1-b4f56a)](https://github.com/samalyxx/appunpack/releases/tag/v0.2.1)
 [![Node.js 24.11+](https://img.shields.io/badge/Node.js-24.11%2B-79dcb6)](https://nodejs.org/)
 [![MIT license](https://img.shields.io/badge/license-MIT-76d6ed)](LICENSE)
 
@@ -130,7 +130,9 @@ The CLI does not require an AI account. If you connect a cloud AI client, the to
 
 Three public APK fixtures were processed locally. All produced source, resources and reports; all reported a **partial** export. One recovered sieve algorithm was also compared against its original source and an independent check for six inputs.
 
-The [verification record](docs/testing.md) includes fixture identities, hashes, error counts, test coverage and what was not checked. GitHub Actions runs the unit/parser checks on Windows and Ubuntu; that CI matrix does not run target Android apps.
+Additional launch checks analyzed the official NetGuard 2.337 and Mullvad 2026.12 APKs, a Jellyfin 2.7.3 release bundle's base/ABI/density splits, and Android Frida attachment on an isolated API 36 emulator. The split APKs also passed an install/pull/hash/analysis round trip. Production Java exports remained partial; these checks establish useful output, not complete reconstruction.
+
+The [verification record](docs/testing.md) includes fixture identities, hashes, error counts, test coverage and what was not checked. GitHub Actions runs unit/parser checks on Windows and Ubuntu and a separate real JADX integration workflow on Ubuntu. CI does not install or launch target Android apps.
 
 ## Initial iOS support
 

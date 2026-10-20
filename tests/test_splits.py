@@ -59,6 +59,21 @@ class SplitInputTests(unittest.TestCase):
         self.assertEqual(result["input"], {"path": str(directory), "kind": "directory"})
         self.assertEqual([part["source"] for part in result["parts"]], [str(directory / "base.apk"), str(directory / "config.apk")])
 
+    def test_snapshot_preserves_valid_case_distinct_apk_resource_names(self):
+        data = io.BytesIO()
+        with zipfile.ZipFile(data, "w") as archive:
+            archive.writestr("AndroidManifest.xml", b'<manifest package="org.example"/>')
+            archive.writestr("res/2F.xml", b"first")
+            archive.writestr("res/2f.xml", b"second")
+        original = data.getvalue()
+        path = self.archive([("base.apk", original)])
+        prepared = splits.prepare(path, self.output)
+        copied = Path(prepared["parts"][0]["path"])
+        self.assertEqual(copied.read_bytes(), original)
+        with zipfile.ZipFile(copied) as archive:
+            self.assertEqual(archive.read("res/2F.xml"), b"first")
+            self.assertEqual(archive.read("res/2f.xml"), b"second")
+
     def test_rejects_bundletool_variants_before_creating_output(self):
         path = self.archive([("toc.pb", b"device targeting"), ("splits/base.apk", self.apk())])
         with self.assertRaisesRegex(ValueError, "device variants"):

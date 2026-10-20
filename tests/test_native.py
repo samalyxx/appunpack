@@ -57,9 +57,20 @@ class NativeArchiveTests(unittest.TestCase):
             archive.writestr(member, "/outside")
         with self.assertRaisesRegex(ValueError, "links"):
             inspect_apk(path)
-        path = self.apk([("lib/arm64/libx.so", b"a"), ("lib/arm64/LIBX.SO", b"b")])
+        path = self.apk([("lib/arm64/libx.so", b"a"), ("lib/arm64/libx.so", b"b")])
         with self.assertRaisesRegex(ValueError, "Repeated"):
             inspect_apk(path)
+
+    def test_selected_library_allows_case_distinct_resources_but_decode_rejects_them(self):
+        path = self.apk([("lib/arm64/libx.so", b"fixture"), ("res/2F.xml", b"A"), ("res/2f.xml", b"B")])
+        archive, report = inspect_apk(path)
+        archive.close()
+        self.assertEqual(report["libraries"], ["lib/arm64/libx.so"])
+        output = self.root / "selected.so"
+        extract_library(path, "lib/arm64/libx.so", output)
+        self.assertEqual(output.read_bytes(), b"fixture")
+        with self.assertRaisesRegex(ValueError, "Repeated"):
+            inspect_apk(path, extract_all=True)
 
     def test_rejects_expanded_size_budget_before_reading(self):
         path = self.apk([("lib/arm64/libx.so", b"a")])

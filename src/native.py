@@ -15,11 +15,11 @@ MAX_FILE_BYTES = 512 * 1024 * 1024
 MAX_TOTAL_BYTES = 4 * 1024 * 1024 * 1024
 
 
-def inspect_apk(path):
+def inspect_apk(path, *, extract_all=False):
     path = Path(path)
     if not path.is_file() or path.stat().st_size > MAX_FILE_BYTES:
         raise ValueError("APK must be a regular file of at most 512 MiB.")
-    archive = checked_archive(path)
+    archive = checked_archive(path, allow_case_collisions=not extract_all)
     try:
         total = 0
         libraries = []
@@ -70,15 +70,15 @@ def extract_library(apk, member, destination):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("mode", choices=("check", "extract"))
+    parser.add_argument("mode", choices=("check", "check-decode", "extract"))
     parser.add_argument("apk")
     parser.add_argument("member", nargs="?")
     parser.add_argument("destination", nargs="?")
     args = parser.parse_args()
-    if args.mode == "check":
+    if args.mode in ("check", "check-decode"):
         if args.member or args.destination:
             parser.error("check accepts only an APK path")
-        archive, report = inspect_apk(args.apk)
+        archive, report = inspect_apk(args.apk, extract_all=args.mode == "check-decode")
         archive.close()
     else:
         if not args.member or not args.destination:

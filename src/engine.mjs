@@ -46,7 +46,7 @@ export function toolValue(reply) {
 
 export async function withEngine(apk, callback) {
   const jar = await selectedJar();
-  const client = new Client({ name: "appunpack", version: "0.2.0" });
+  const client = new Client({ name: "appunpack", version: "0.2.1" });
   const transport = new StdioClientTransport({ command: javaCommand(), args: javaArgs(jar), stderr: "inherit" });
   try {
     await client.connect(transport, { timeout: 30_000 });

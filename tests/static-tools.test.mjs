@@ -45,7 +45,7 @@ test("Apktool decoding preserves literal paths, isolates frameworks, never uses 
   const calls = [];
   const run = async (command, args, options) => {
     calls.push({ command, args, options });
-    if (args.includes("check")) return { stdout: '{"libraries":[],"entries":2}' };
+    if (args.includes("check-decode")) return { stdout: '{"libraries":[],"entries":2}' };
     if (args.includes("--version")) return { stdout: "3.0.3\n" };
     await mkdir(join(output, "decoded"));
     await writeFile(join(output, "decoded", "AndroidManifest.xml"), "<manifest/>");
@@ -70,7 +70,7 @@ test("Apktool rejects an older tool and preserves the diagnostic directory", asy
   await writeFile(environment.APPUNPACK_APKTOOL_JAR, "test jar");
   let javaCalls = 0;
   await assert.rejects(decodeApk(input, output, environment, async (_command, args) => {
-    if (args.includes("check")) return { stdout: '{"libraries":[]}' };
+    if (args.includes("check-decode")) return { stdout: '{"libraries":[]}' };
     javaCalls++;
     return { stdout: "2.12.1\n" };
   }), /3\.0\.3 or newer/);

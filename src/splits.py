@@ -18,18 +18,21 @@ MAX_TOTAL_BYTES = 4 * 1024 * 1024 * 1024
 MAX_CONTAINER_BYTES = 8 * 1024 * 1024 * 1024
 
 
-def checked_archive(path):
+def checked_archive(path, *, allow_case_collisions=False):
     with path.open("rb") as stream:
         check_zip_directory(stream, path.stat().st_size)
     archive = zipfile.ZipFile(path)
     try:
         names = set()
+        folded_names = set()
         for info in archive.infolist():
             safe_parts(info)
-            name = info.filename.casefold()
-            if name in names:
+            name = info.filename
+            folded = name.casefold()
+            if name in names or (not allow_case_collisions and folded in folded_names):
                 raise ValueError("Repeated ZIP entry names are not supported.")
             names.add(name)
+            folded_names.add(folded)
             mode = info.external_attr >> 16
             if stat.S_ISLNK(mode) or (stat.S_IFMT(mode) not in (0, stat.S_IFREG, stat.S_IFDIR)):
                 raise ValueError("ZIP links and special files are not supported.")
@@ -67,7 +70,7 @@ def copy_part(stream, destination, expected):
             output.write(chunk)
     if length != expected:
         raise ValueError("APK stream length does not match its declared size.")
-    with checked_archive(destination) as apk:
+    with checked_archive(destination, allow_case_collisions=True) as apk:
         if "AndroidManifest.xml" not in apk.namelist():
             raise ValueError("Each APK part must contain AndroidManifest.xml.")
     return {"path": str(destination), "sha256": result.hexdigest(), "bytes": length}

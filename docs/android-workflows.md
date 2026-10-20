@@ -52,7 +52,7 @@ node bin/appunpack.mjs decode ./Example.apk --output ./reports/apktool
 
 Open `decoded/AndroidManifest.xml`, `decoded/res/`, any `decoded/smali*/` directories and `decoded/apktool.yml`. `report.json` retains the APK hash, archive inventory and Apktool version/JAR hash; `decode.log` retains diagnostics. Framework cache files stay inside this output directory. No force-overwrite, rebuilding or signing step is used.
 
-APK preflight limits compressed input/individual entries to 512 MiB and expanded archive totals to 4 GiB. Decoding has a ten-minute deadline. Apktool may reject or only partially decode an app; retain its failure output rather than treating existing files as a successful decode.
+APK preflight limits compressed input/individual entries to 512 MiB and expanded archive totals to 4 GiB. Decoding has a ten-minute deadline. Whole-archive decoding refuses paths that differ only by case, preventing extraction collisions on Windows. Native inventory and selected-library extraction accept those resource paths because only the selected member is written to a fixed filename. Apktool may reject or only partially decode an app; retain its failure output rather than treating existing files as a successful decode.
 
 ## Inspect Android native libraries with Ghidra
 
@@ -71,7 +71,7 @@ node bin/appunpack.mjs native ./libexample.so --output ./reports/native
 
 AppUnpack checks the ELF header, imports the file into Ghidra, runs auto-analysis and exports `pseudocode.c`, `functions.json` and `report.json`. Logs, the input snapshot for an APK member, and the Ghidra project are retained. Target machine code is not executed.
 
-The export is bounded: 180 seconds for auto-analysis; 180 seconds total decompilation; 15 seconds per function; at most 5,000 functions and 16 MiB of pseudocode. The outer process has a ten-minute deadline. Failed functions and truncation remain visible as partial results. Reconstructed C-like pseudocode is not the original C/C++ source. Stripped symbols, obfuscation, unsupported instructions and missing dependencies can limit recovery. This command is for Android-style ELF shared libraries; it does not implement iOS Mach-O analysis.
+The export is bounded: a requested 180-second auto-analysis limit; a 180-second decompilation budget checked between functions; 15 seconds per function; at most 5,000 functions and 16 MiB of pseudocode. Ghidra can overrun its cooperative analysis limit before returning control. The outer process has a hard ten-minute deadline. Failed functions and truncation remain visible as partial results. Reconstructed C-like pseudocode is not the original C/C++ source. Stripped symbols, obfuscation, unsupported instructions and missing dependencies can limit recovery. This command is for Android-style ELF shared libraries; it does not implement iOS Mach-O analysis.
 
 ## Copy an installed app through ADB
 

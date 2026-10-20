@@ -25,6 +25,7 @@ export async function prepareSplits(input, output) {
     limitations: [
       "Supplied APK parts are analyzed together by JADX; no installable merged APK is created.",
       "Combined resource paths can collide. Each part's decoded resources are also retained under decompiled/part-resources/part-NNN in the APK order recorded in evidence.",
+      "Case-distinct resource names inside one APK may collide on a case-insensitive filesystem; use a case-sensitive host when exact resource preservation is required.",
       "Package/version identity, one base APK and unique split names were checked; signatures, device targeting and completeness were not verified.",
       "Bundletool archives with toc.pb require device-specific extraction first; alternative variants are not combined automatically.",
       "Only APK entries are copied. Expansion OBB files and other archive payloads are not analyzed.",
