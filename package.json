@@ -1,0 +1,20 @@
+{
+  "name": "@samalyxx/apk-lens",
+  "version": "0.1.0",
+  "description": "Local Android APK analysis, AI-agent tools, and static iOS package inspection.",
+  "type": "module",
+  "license": "MIT",
+  "repository": { "type": "git", "url": "git+https://github.com/samalyxx/apk-lens.git" },
+  "homepage": "https://github.com/samalyxx/apk-lens#readme",
+  "bugs": { "url": "https://github.com/samalyxx/apk-lens/issues" },
+  "bin": { "apk-lens": "bin/apk-lens.mjs" },
+  "engines": { "node": ">=24.11.0" },
+  "files": ["bin", "src/*.mjs", "src/*.py", "docs", "skills", "README.md", "LICENSE", "THIRD_PARTY_NOTICES.md", "SECURITY.md"],
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "test:integration": "node --test tests/integration/*.test.mjs",
+    "test:ios": "python -m unittest discover -s tests -p test_ipa.py",
+    "start": "node bin/apk-lens.mjs"
+  },
+  "dependencies": { "@modelcontextprotocol/client": "2.3.1" }
+}

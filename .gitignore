@@ -1,0 +1,17 @@
+node_modules/
+.tools/
+reports/
+*.apk
+*.apks
+*.aab
+*.ipa
+*.jar
+*.tgz
+.env
+.env.*
+!.env.example
+*.log
+.DS_Store
+Thumbs.db
+__pycache__/
+*.pyc

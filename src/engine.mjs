@@ -1,0 +1,76 @@
+import { spawn } from "node:child_process";
+import { stat } from "node:fs/promises";
+import { isAbsolute, join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+import { Client } from "@modelcontextprotocol/client";
+import { StdioClientTransport } from "@modelcontextprotocol/client/stdio";
+import { JADX, sha256 } from "./tools.mjs";
+
+export const root = fileURLToPath(new URL("..", import.meta.url));
+
+export function javaCommand(environment = process.env) {
+  return environment.JAVA_HOME ? join(environment.JAVA_HOME, "bin", process.platform === "win32" ? "java.exe" : "java") : "java";
+}
+
+export function javaArgs(jar, environment = process.env) {
+  const heap = environment.APK_LENS_HEAP_MIB;
+  if (heap !== undefined && (!/^[1-9][0-9]*$/.test(heap) || !Number.isSafeInteger(Number(heap)))) throw new Error("APK_LENS_HEAP_MIB must be a positive integer in MiB.");
+  return [...(heap ? [`-Xmx${heap}m`] : []), "-Dorg.slf4j.simpleLogger.defaultLogLevel=warn", "-jar", jar, "--threads", "1"];
+}
+
+export async function selectedJar(environment = process.env) {
+  const jar = environment.APK_LENS_JADX_JAR ?? join(root, ".tools", JADX.filename);
+  if (!isAbsolute(jar)) throw new Error("APK_LENS_JADX_JAR must be an absolute path.");
+  let digest;
+  try { digest = await sha256(jar); } catch (error) {
+    if (error.code === "ENOENT") throw new Error("JADX is missing. Run install-tools or set APK_LENS_JADX_JAR to the verified JAR.");
+    throw error;
+  }
+  if (digest !== JADX.sha256) throw new Error("The selected JADX JAR does not match the pinned SHA-256. Run install-tools into a new directory.");
+  return jar;
+}
+
+export function toolValue(reply) {
+  if (reply.isError) throw new Error(reply.content?.filter((item) => item.type === "text").map((item) => item.text).join("\n") || "JADX tool failed.");
+  if (reply.structuredContent !== undefined) return reply.structuredContent;
+  const text = reply.content?.filter((item) => item.type === "text").map((item) => item.text).join("\n");
+  if (text === undefined) throw new Error("JADX returned no text or structured result.");
+  if (/^\s*(?:\/\/\s*)?ERROR:/i.test(text)) throw new Error(text);
+  try { return JSON.parse(text); } catch { return text; }
+}
+
+export async function withEngine(apk, callback) {
+  const jar = await selectedJar();
+  const client = new Client({ name: "apk-lens", version: "0.1.0" });
+  const transport = new StdioClientTransport({ command: javaCommand(), args: javaArgs(jar), stderr: "inherit" });
+  try {
+    await client.connect(transport, { timeout: 30_000 });
+    const call = async (name, args = {}) => toolValue(await client.callTool({ name, arguments: args }, { timeout: 120_000 }));
+    if (apk !== undefined) {
+      const path = resolve(apk);
+      if (!(await stat(path)).isFile()) throw new Error("APK input must be a regular file.");
+      await call("load_apk", { path });
+    }
+    return await callback(call, client);
+  } finally {
+    await client.close();
+    await transport.close();
+  }
+}
+
+export async function forwardProcess(command, args) {
+  const child = spawn(command, args, { stdio: "inherit", shell: false, windowsHide: true });
+  const onInt = () => child.kill("SIGINT");
+  const onTerm = () => child.kill("SIGTERM");
+  process.on("SIGINT", onInt);
+  process.on("SIGTERM", onTerm);
+  try {
+    return await new Promise((resolve, reject) => {
+      child.once("error", reject);
+      child.once("close", (code, signal) => resolve(code ?? (signal === "SIGINT" ? 130 : 1)));
+    });
+  } finally {
+    process.off("SIGINT", onInt);
+    process.off("SIGTERM", onTerm);
+  }
+}
