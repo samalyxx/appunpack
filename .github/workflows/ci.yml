@@ -20,5 +20,5 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: npm run test:ios
-      - run: node bin/apk-lens.mjs --help
+      - run: node bin/appunpack.mjs --help
       - run: npm pack --dry-run

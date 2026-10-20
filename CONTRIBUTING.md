@@ -5,7 +5,7 @@ Keep changes focused on inspecting an APK and understanding its evidence. Reuse 
 ```sh
 npm ci
 npm test
-node bin/apk-lens.mjs --help
+node bin/appunpack.mjs --help
 ```
 
 For real Android validation, follow [installation](docs/installation.md), run `doctor` and inspect a small APK you are allowed to use. For IPA validation, use a self-built or otherwise redistributable fixture. Record host, Node/Java/Python versions, engine digest, exact commands and what actually passed. Unit or fixture tests alone do not establish cross-platform engine support.

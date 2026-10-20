@@ -5,13 +5,14 @@ import { forwardProcess, javaArgs, javaCommand, root, selectedJar, withEngine } 
 import { analyze, inspectPackage } from "./report.mjs";
 import { installTools } from "./tools.mjs";
 
-const HELP = `APK Lens — local Android analysis and static iOS package inspection
+const HELP = `AppUnpack — local Android analysis and static iOS package inspection
 
-Usage: node bin/apk-lens.mjs COMMAND [arguments]
+Usage: node bin/appunpack.mjs COMMAND [arguments]
 
   install-tools [DIRECTORY]          Download and SHA-256 verify JADX
   doctor                            Check Java/JADX MCP readiness
-  analyze APK --output NEW_DIR       Save evidence, manifest, and a readable report
+  APK [--output NEW_DIR]             Export code/resources, evidence, and report
+  analyze APK [--output NEW_DIR]     Same; default is APK_NAME-analysis beside APK
   inspect APK                       App declarations and decoded manifest
   classes APK QUERY                 Search class names
   class APK CLASS_NAME              Class summary, methods, fields
@@ -29,10 +30,10 @@ Inspect and decompile only files you are authorized to analyze.
 
 export function mcpConfig(environment = process.env) {
   const env = {};
-  for (const name of ["JAVA_HOME", "APK_LENS_JADX_JAR", "APK_LENS_HEAP_MIB"]) if (environment[name]) env[name] = environment[name];
-  return { mcpServers: { "apk-lens": {
+  for (const name of ["JAVA_HOME", "APPUNPACK_JADX_JAR", "APPUNPACK_HEAP_MIB"]) if (environment[name]) env[name] = environment[name];
+  return { mcpServers: { "appunpack": {
     command: process.execPath,
-    args: [fileURLToPath(new URL("../bin/apk-lens.mjs", import.meta.url)), "mcp"],
+    args: [fileURLToPath(new URL("../bin/appunpack.mjs", import.meta.url)), "mcp"],
     env,
   } } };
 }
@@ -45,9 +46,9 @@ export function parseCommand(args) {
 }
 
 export async function main(args) {
-  const [command, ...rest] = args;
+  let [command, ...rest] = args;
   if (!command || ["--help", "-h", "help"].includes(command)) { process.stdout.write(HELP); return 0; }
-  if (command === "--version") { process.stdout.write("apk-lens 0.1.0\n"); return 0; }
+  if (command === "--version") { process.stdout.write("appunpack 0.1.0\n"); return 0; }
   if (command === "install-tools") {
     if (rest.length > 1 || rest[0]?.startsWith("-")) throw new Error("Usage: install-tools [DIRECTORY]");
     process.stdout.write(`Verified JADX: ${await installTools(rest[0] ?? join(root, ".tools"))}\n`);
@@ -70,6 +71,7 @@ export async function main(args) {
     process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
     return 0;
   }
+  if (/\.apk$/i.test(command)) { rest = [command, ...rest]; command = "analyze"; }
   const counts = { inspect: 1, analyze: 1, classes: 2, class: 2, source: 2, method: 3, references: 2, resources: 1, ipa: 1 };
   if (!Object.hasOwn(counts, command)) throw new Error(`Unknown command: ${command}. Use --help.`);
   const { values, positionals } = parseCommand(rest);
@@ -83,8 +85,8 @@ export async function main(args) {
   }
   const [apk, className, methodName] = positionals;
   if (["analyze", "ipa"].includes(command)) {
-    if (!values.output) throw new Error(`${command} requires --output NEW_DIRECTORY.`);
-    if (command === "ipa") return forwardProcess(process.env.APK_LENS_PYTHON ?? (process.platform === "win32" ? "python" : "python3"), [join(root, "src", "ipa.py"), resolve(apk), "--output", values.output]);
+    if (command === "ipa" && !values.output) throw new Error("ipa requires --output NEW_DIRECTORY.");
+    if (command === "ipa") return forwardProcess(process.env.APPUNPACK_PYTHON ?? (process.platform === "win32" ? "python" : "python3"), [join(root, "src", "ipa.py"), resolve(apk), "--output", values.output]);
     process.stdout.write(`Report saved: ${await analyze(apk, values.output)}\n`);
     return 0;
   }

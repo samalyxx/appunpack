@@ -1,6 +1,7 @@
 node_modules/
 .tools/
 reports/
+*-analysis/
 *.apk
 *.apks
 *.aab

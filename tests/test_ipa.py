@@ -21,7 +21,7 @@ spec.loader.exec_module(ipa)
 
 class IpaInspectionTests(unittest.TestCase):
     def setUp(self):
-        self.temporary = tempfile.TemporaryDirectory(prefix="apk-lens-ipa-")
+        self.temporary = tempfile.TemporaryDirectory(prefix="appunpack-ipa-")
         self.addCleanup(self.temporary.cleanup)
         self.root = Path(self.temporary.name)
 

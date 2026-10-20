@@ -11,7 +11,7 @@ const content = Buffer.from("local test JAR bytes\n");
 const digest = createHash("sha256").update(content).digest("hex");
 
 async function fixture(t, handler) {
-  const directory = await mkdtemp(join(tmpdir(), "apk-lens-tools-"));
+  const directory = await mkdtemp(join(tmpdir(), "appunpack-tools-"));
   t.after(() => rm(directory, { recursive: true, force: true }));
   const server = createServer(handler);
   await new Promise((resolve, reject) => {

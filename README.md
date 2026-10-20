@@ -1,8 +1,8 @@
-# APK Lens
+# AppUnpack
 
-**Inspect Android APKs from your computer or AI coding agent. Save the evidence behind the answer.**
+**Give it an APK. Get decompiled code, decoded resources and a local report.**
 
-APK Lens connects directly to the [JADX headless engine](https://github.com/1013503897/jadx-headless-mcp) for package inspection, class search, decompiled source, methods, references and string resources. It adds a local CLI, saved reports and an APK analysis skill. A separate Python standard-library workflow provides initial iOS IPA inventory.
+AppUnpack runs the [JADX engine](https://github.com/1013503897/jadx-headless-mcp) on your computer. Its default workflow exports an Android APK's decompiled Java and decoded resources, with manifest, evidence and a readable report. You can also inspect individual classes or connect an AI coding agent. A separate Python workflow provides initial iOS IPA inventory.
 
 [Installation](docs/installation.md) · [Commands](docs/usage.md) · [AI agents](docs/agents.md) · [Android and iOS research](docs/mobile-tooling-research.md) · [Testing](docs/testing.md) · [Security](SECURITY.md)
 
@@ -12,18 +12,28 @@ Desktop analysis gives the Java engine more memory, an isolated workspace and ac
 
 ## Quick start
 
-Install Git, Node.js 24.11 or newer, npm and Java 17 or newer. Then:
+Install Git, Node.js 24.11 or newer, npm and a Java 17 or newer **JDK**. Then:
 
 ```sh
-git clone https://github.com/samalyxx/apk-lens.git
-cd apk-lens
+git clone https://github.com/samalyxx/appunpack.git
+cd appunpack
 npm ci
-node bin/apk-lens.mjs install-tools
-node bin/apk-lens.mjs doctor
-node bin/apk-lens.mjs analyze ./Example.apk --output ./reports/example
+node bin/appunpack.mjs install-tools
+node bin/appunpack.mjs doctor
+node bin/appunpack.mjs ./Uber.apk
 ```
 
-If Java is not on `PATH`, set `JAVA_HOME` to your existing Java installation. The default JAR is stored in the checkout's `.tools` directory. See [installation](docs/installation.md) for PowerShell examples, custom tool paths and optional Python setup.
+Replace `./Uber.apk` with the actual APK file you obtained. AppUnpack does not download an app from its name or a Play Store link. It creates a new `Uber-analysis` directory beside the APK and refuses to overwrite an existing directory.
+
+The export runs locally and does not need an AI account.
+
+On Windows, the included launcher also accepts the file directly:
+
+```powershell
+.\appunpack.ps1 'C:\Apps\Uber.apk'
+```
+
+The launcher uses `APPUNPACK_NODE`, a portable `.tools/node.exe`, or Node on `PATH`, in that order. It can use Android Studio's bundled Java when `JAVA_HOME` and Java on `PATH` are unavailable. See [installation](docs/installation.md) for runtime setup.
 
 The new report directory contains:
 
@@ -32,16 +42,22 @@ The new report directory contains:
 | `report.md` | Readable package summary and limitations |
 | `evidence.json` | Collected engine responses and artifact identity |
 | `manifest.xml` | Manifest XML returned by JADX |
+| `decompiled/sources/` | Decompiled Java files |
+| `decompiled/resources/` | Decoded application resources |
+| `decompiled/export.json` | Export counts, errors and completion status |
+| `decompile.log` | Export diagnostics; keep this when output is partial |
+
+Open `report.md` first, then browse `decompiled/sources` and `decompiled/resources`. To choose the destination explicitly, use `node bin/appunpack.mjs analyze ./Uber.apk --output ./reports/uber`.
 
 ## Follow the code
 
 ```sh
-node bin/apk-lens.mjs classes ./Example.apk MainActivity
-node bin/apk-lens.mjs class ./Example.apk com.example.MainActivity
-node bin/apk-lens.mjs source ./Example.apk com.example.MainActivity
-node bin/apk-lens.mjs method ./Example.apk com.example.MainActivity onCreate
-node bin/apk-lens.mjs references ./Example.apk com.example.MainActivity --method-name onCreate
-node bin/apk-lens.mjs resources ./Example.apk --query title
+node bin/appunpack.mjs classes ./Example.apk MainActivity
+node bin/appunpack.mjs class ./Example.apk com.example.MainActivity
+node bin/appunpack.mjs source ./Example.apk com.example.MainActivity
+node bin/appunpack.mjs method ./Example.apk com.example.MainActivity onCreate
+node bin/appunpack.mjs references ./Example.apk com.example.MainActivity --method-name onCreate
+node bin/appunpack.mjs resources ./Example.apk --query title
 ```
 
 Use the class result to select an overloaded method. [Command details](docs/usage.md) explain results and limits.
@@ -49,7 +65,7 @@ Use the class result to select an overloaded method. [Command details](docs/usag
 ## Connect your AI agent
 
 ```sh
-node bin/apk-lens.mjs mcp-config
+node bin/appunpack.mjs mcp-config
 ```
 
 Review the printed configuration and add it to your client's MCP settings. The server launches the Android JADX engine directly over stdio. The [APK analysis skill](skills/apk-analysis/SKILL.md) gives an agent a focused investigation workflow. See [agent setup](docs/agents.md) for Codex and generic clients.
@@ -63,14 +79,14 @@ Example prompt:
 With Python 3.10 or newer installed:
 
 ```sh
-node bin/apk-lens.mjs ipa ./Example.ipa --output ./reports/ios-example
+node bin/appunpack.mjs ipa ./Example.ipa --output ./reports/ios-example
 ```
 
 This workflow inventories the IPA archive and bundle metadata. Executable decompilation, FairPlay decryption and iOS runtime analysis are outside its scope. See [IPA usage](docs/usage.md#inspect-an-ipa).
 
 ## What the results mean
 
-- Decompiled Java is a derived view. It does not recover the original Kotlin/Java project or guarantee a buildable reconstruction.
+- Decompiled Java is a derived view. It does not recover the original Kotlin/Java project, backend services or a guaranteed buildable reconstruction.
 - Static references and manifest declarations do not establish runtime calls or vulnerability exploitability.
 - Reports do not validate APK/IPA signatures or certify an application as safe.
 - Obfuscation, missing splits, native code and engine limits can leave gaps. This version does not merge split APKs or analyze AABs as complete applications.

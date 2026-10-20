@@ -9,41 +9,42 @@ import { after, before, test } from "node:test";
 import { Client } from "@modelcontextprotocol/client";
 import { StdioClientTransport } from "@modelcontextprotocol/client/stdio";
 import { toolValue } from "../../src/engine.mjs";
+import { defaultOutput } from "../../src/report.mjs";
 import { JADX, sha256 } from "../../src/tools.mjs";
 
-const ready = Boolean(process.env.APK_LENS_TEST_APK && process.env.APK_LENS_JADX_JAR);
-const options = { skip: ready ? false : "Set APK_LENS_TEST_APK and APK_LENS_JADX_JAR (see README.md)", timeout: 600_000 };
+const ready = Boolean(process.env.APPUNPACK_TEST_APK && process.env.APPUNPACK_JADX_JAR);
+const options = { skip: ready ? false : "Set APPUNPACK_TEST_APK and APPUNPACK_JADX_JAR (see README.md)", timeout: 600_000 };
 const fixtureDigest = "a9eecf37b26cd084855c530db81c2bb1b91f4c1b095a04f47aa7c20e2791f686";
 const className = "io.appium.android.apis.ApiDemos";
-const entrypoint = fileURLToPath(new URL("../../bin/apk-lens.mjs", import.meta.url));
+const entrypoint = fileURLToPath(new URL("../../bin/appunpack.mjs", import.meta.url));
 const execute = promisify(execFile);
 let scratch;
 let apk;
 
 before(async () => {
   if (!ready) return;
-  assert.equal(await sha256(process.env.APK_LENS_TEST_APK), fixtureDigest, "Use the documented Appium ApiDemos v6.0.18 fixture");
-  scratch = await mkdtemp(join(tmpdir(), "apk-lens-integration-"));
+  assert.equal(await sha256(process.env.APPUNPACK_TEST_APK), fixtureDigest, "Use the documented Appium ApiDemos v6.0.18 fixture");
+  scratch = await mkdtemp(join(tmpdir(), "appunpack-integration-"));
   apk = join(scratch, "Api Demos & literal$().apk");
-  await copyFile(process.env.APK_LENS_TEST_APK, apk);
+  await copyFile(process.env.APPUNPACK_TEST_APK, apk);
 });
 
 after(async () => {
   if (!scratch) return;
   try {
-    assert.equal(await sha256(process.env.APK_LENS_TEST_APK), fixtureDigest, "Original APK changed");
+    assert.equal(await sha256(process.env.APPUNPACK_TEST_APK), fixtureDigest, "Original APK changed");
     assert.equal(await sha256(apk), fixtureDigest, "Analysis input changed");
   } finally {
     await rm(scratch, { recursive: true, force: true });
   }
 });
 
-const environment = () => ({ ...process.env, APK_LENS_JADX_JAR: resolve(process.env.APK_LENS_JADX_JAR) });
+const environment = () => ({ ...process.env, APPUNPACK_JADX_JAR: resolve(process.env.APPUNPACK_JADX_JAR) });
 
 async function cli(args) {
   return execute(process.execPath, [entrypoint, ...args], {
     cwd: scratch, shell: false, windowsHide: true, env: environment(),
-    timeout: 150_000, maxBuffer: 8 * 1024 * 1024,
+    timeout: 600_000, maxBuffer: 8 * 1024 * 1024,
   });
 }
 
@@ -51,7 +52,7 @@ async function observation(args) {
   return JSON.parse((await cli([...args, "--json"])).stdout);
 }
 
-test("real APK inspection produces a report and protects previous evidence", options, async () => {
+test("an APK alone exports source/resources and protects previous evidence", options, async () => {
   const inspection = await observation(["inspect", apk]);
   assert.equal(inspection.app_info.package, "io.appium.android.apis");
   assert.equal(inspection.app_info.version_name, "6.0.18");
@@ -61,8 +62,8 @@ test("real APK inspection produces a report and protects previous evidence", opt
   assert.match(inspection.manifest, /<manifest/);
   assert.match(inspection.manifest, /io\.appium\.android\.apis/);
 
-  const output = join(scratch, "reports", "Api Demos");
-  await cli(["analyze", apk, "--output", output]);
+  const output = defaultOutput(apk);
+  await cli([apk]);
   const savedText = await readFile(join(output, "evidence.json"), "utf8");
   const saved = JSON.parse(savedText);
   assert.equal(saved.schema_version, 1);
@@ -73,8 +74,18 @@ test("real APK inspection produces a report and protects previous evidence", opt
   assert.deepEqual(saved.analysis.app_info, inspection.app_info);
   assert.equal(saved.analysis.manifest, inspection.manifest);
   assert.equal(await readFile(join(output, "manifest.xml"), "utf8"), saved.analysis.manifest);
+  const exported = JSON.parse(await readFile(join(output, "decompiled", "export.json"), "utf8"));
+  assert.deepEqual(exported, saved.decompilation);
+  assert.ok(exported.classes > 0);
+  assert.equal(exported.status, exported.errors > 0 || exported.warnings > 0 ? "partial" : "completed");
+  assert.equal(typeof exported.version, "string");
+  assert.ok(exported.version.length > 0);
+  assert.match(await readFile(join(output, "decompiled", "sources", "io", "appium", "android", "apis", "ApiDemos.java"), "utf8"), /class ApiDemos/);
+  assert.match(await readFile(join(output, "decompiled", "resources", "AndroidManifest.xml"), "utf8"), /io\.appium\.android\.apis/);
+  assert.equal(typeof await readFile(join(output, "decompile.log"), "utf8"), "string");
   assert.match(await readFile(join(output, "report.md"), "utf8"), /io\.appium\.android\.apis/);
   await assert.rejects(cli(["analyze", apk, "--output", output]), /EEXIST|already exists/);
+  await assert.rejects(cli([apk]), /EEXIST|already exists/);
   assert.equal(await readFile(join(output, "evidence.json"), "utf8"), savedText);
 });
 
@@ -93,7 +104,7 @@ test("real APK class search, method source and incoming references use direct JA
 });
 
 test("public stdio MCP command supports APK loading and app inspection", options, async () => {
-  const client = new Client({ name: "apk-lens-integration", version: "1" });
+  const client = new Client({ name: "appunpack-integration", version: "1" });
   const transport = new StdioClientTransport({ command: process.execPath, args: [entrypoint, "mcp"], cwd: scratch, env: environment(), stderr: "inherit" });
   let pid;
   try {

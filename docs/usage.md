@@ -1,12 +1,13 @@
 # Commands and evidence
 
-Run from the checkout with `node bin/apk-lens.mjs`, or use `apk-lens` after `npm link`. Quote paths containing spaces.
+Run from the checkout with `node bin/appunpack.mjs`, or use `appunpack` after `npm link`. Quote paths containing spaces.
 
 | Command | Purpose |
 | --- | --- |
+| `APK [--output NEW_DIRECTORY]` | Export decompiled code/resources and save a report; defaults to a sibling `NAME-analysis` directory |
 | `install-tools [DIRECTORY]` | Download and verify the pinned engine JAR |
 | `doctor` | Check Java and JADX engine readiness |
-| `analyze APK --output NEW_DIRECTORY` | Save a package report, evidence JSON and decoded manifest |
+| `analyze APK [--output NEW_DIRECTORY]` | The same full APK export with an explicit command name |
 | `inspect APK` | Inspect package and manifest metadata |
 | `classes APK QUERY` | Search class names |
 | `class APK FQCN` | Inspect one fully qualified class and its members |
@@ -19,26 +20,38 @@ Run from the checkout with `node bin/apk-lens.mjs`, or use `apk-lens` after `npm
 | `mcp-config` | Print an MCP configuration using this checkout |
 | `--help` | Show command help |
 
-Analysis results are JSON by default; `--json` is accepted explicitly for the inspection commands. `analyze` and `ipa` write their reports to `--output` instead.
+Inspection results are JSON by default; `--json` is accepted explicitly for those commands. APK export and `ipa` write files to their destination instead. `ipa` still requires `--output`.
 
-## Create an APK report
+## Give it an APK
 
 ```sh
-node bin/apk-lens.mjs analyze ./Example.apk --output ./reports/example
+node bin/appunpack.mjs ./Uber.apk
 ```
 
-Choose a new destination so previous evidence stays intact. `reports/` is ignored by this repository's Git configuration. The report keeps the collected engine observations in `evidence.json` and the returned manifest in `manifest.xml`. Keep these files with the readable `report.md` when reviewing a finding.
+This creates `Uber-analysis` beside the input file. On Windows you can use `.\appunpack.ps1 'C:\Apps\Uber.apk'`. The input must be an actual APK file; an app name such as `Uber` or a Play Store URL is not a package.
+
+The output contains `report.md`, `evidence.json`, `manifest.xml`, `decompiled/sources/`, `decompiled/resources/`, `decompiled/export.json` and `decompile.log`. Start with the report and export status, then browse the Java files and decoded resources. Warnings and export errors can mean partial output even when useful files were retained.
+
+To choose a destination:
+
+```sh
+node bin/appunpack.mjs analyze ./Uber.apk --output ./reports/uber
+```
+
+Both forms require a new destination and refuse to overwrite an existing one. A failed attempt may leave diagnostic or partial files; use a new destination to retry. Keep collected observations and logs with the report. Target files and analysis output can be confidential; keep them out of public commits.
+
+A Play-installed app may consist of a base APK and additional split APKs. One exported file may omit code or resources required for the complete app. This version does not merge splits, unpack `.apks` collections, or turn an AAB into a complete application. Decompiled output cannot recover the app's servers, private backend logic or original source project.
 
 A manifest reports declarations. A requested permission does not establish that an app exercises that capability. An exported component is a lead for investigation, not an exploitability verdict.
 
 ## Trace a feature
 
 ```sh
-node bin/apk-lens.mjs classes ./Example.apk Search
-node bin/apk-lens.mjs class ./Example.apk com.example.SearchActivity
-node bin/apk-lens.mjs source ./Example.apk com.example.SearchActivity
-node bin/apk-lens.mjs method ./Example.apk com.example.SearchActivity search --overload-index 1
-node bin/apk-lens.mjs references ./Example.apk com.example.SearchActivity --method-name search
+node bin/appunpack.mjs classes ./Example.apk Search
+node bin/appunpack.mjs class ./Example.apk com.example.SearchActivity
+node bin/appunpack.mjs source ./Example.apk com.example.SearchActivity
+node bin/appunpack.mjs method ./Example.apk com.example.SearchActivity search --overload-index 1
+node bin/appunpack.mjs references ./Example.apk com.example.SearchActivity --method-name search
 ```
 
 Select an overload from the current class result. Indices depend on the current artifact and engine; do not reuse them blindly across builds. Decompiled source can be incomplete or fail for individual methods. Static incoming references do not reveal all reflection, dynamic loading, native calls or runtime dispatch.
@@ -46,7 +59,7 @@ Select an overload from the current class result. Indices depend on the current 
 ## Inspect string resources
 
 ```sh
-node bin/apk-lens.mjs resources ./Example.apk --query title
+node bin/appunpack.mjs resources ./Example.apk --query title
 ```
 
 This command requests string-resource data from JADX. It does not rebuild or sign an APK and does not promise a complete resource-table reconstruction. Missing resource results remain unknown until checked against the artifact or a separate decoder.
@@ -54,7 +67,7 @@ This command requests string-resource data from JADX. It does not rebuild or sig
 ## Inspect an IPA
 
 ```sh
-node bin/apk-lens.mjs ipa ./Example.ipa --output ./reports/ios-example
+node bin/appunpack.mjs ipa ./Example.ipa --output ./reports/ios-example
 ```
 
 Python 3.10 or newer is required. This separate workflow writes `evidence.json` and `report.md` with the IPA SHA-256, archive totals, application/extension plist declarations and observed framework paths. It does not extract or launch the application. Plist declarations can include bundle identifiers, version, minimum OS, URL schemes and usage descriptions; malformed or unavailable values remain unknown.

@@ -47,7 +47,7 @@ test("inspection retains the exact app, manifest and session responses", async (
 });
 
 test("analyze refuses existing output before running Java and preserves previous evidence", async (t) => {
-  const directory = await mkdtemp(join(tmpdir(), "apk-lens-report-"));
+  const directory = await mkdtemp(join(tmpdir(), "appunpack-report-"));
   t.after(() => rm(directory, { recursive: true, force: true }));
   const apk = join(directory, "input.apk");
   await writeFile(apk, "test input");

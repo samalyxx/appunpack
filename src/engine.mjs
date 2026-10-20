@@ -1,5 +1,5 @@
 import { spawn } from "node:child_process";
-import { stat } from "node:fs/promises";
+import { open, readFile, stat } from "node:fs/promises";
 import { isAbsolute, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { Client } from "@modelcontextprotocol/client";
@@ -12,18 +12,22 @@ export function javaCommand(environment = process.env) {
   return environment.JAVA_HOME ? join(environment.JAVA_HOME, "bin", process.platform === "win32" ? "java.exe" : "java") : "java";
 }
 
+function javaOptions(environment = process.env) {
+  const heap = environment.APPUNPACK_HEAP_MIB;
+  if (heap !== undefined && (!/^[1-9][0-9]*$/.test(heap) || !Number.isSafeInteger(Number(heap)))) throw new Error("APPUNPACK_HEAP_MIB must be a positive integer in MiB.");
+  return [...(heap ? [`-Xmx${heap}m`] : []), "-Dorg.slf4j.simpleLogger.defaultLogLevel=warn"];
+}
+
 export function javaArgs(jar, environment = process.env) {
-  const heap = environment.APK_LENS_HEAP_MIB;
-  if (heap !== undefined && (!/^[1-9][0-9]*$/.test(heap) || !Number.isSafeInteger(Number(heap)))) throw new Error("APK_LENS_HEAP_MIB must be a positive integer in MiB.");
-  return [...(heap ? [`-Xmx${heap}m`] : []), "-Dorg.slf4j.simpleLogger.defaultLogLevel=warn", "-jar", jar, "--threads", "1"];
+  return [...javaOptions(environment), "-jar", jar, "--threads", "1"];
 }
 
 export async function selectedJar(environment = process.env) {
-  const jar = environment.APK_LENS_JADX_JAR ?? join(root, ".tools", JADX.filename);
-  if (!isAbsolute(jar)) throw new Error("APK_LENS_JADX_JAR must be an absolute path.");
+  const jar = environment.APPUNPACK_JADX_JAR ?? join(root, ".tools", JADX.filename);
+  if (!isAbsolute(jar)) throw new Error("APPUNPACK_JADX_JAR must be an absolute path.");
   let digest;
   try { digest = await sha256(jar); } catch (error) {
-    if (error.code === "ENOENT") throw new Error("JADX is missing. Run install-tools or set APK_LENS_JADX_JAR to the verified JAR.");
+    if (error.code === "ENOENT") throw new Error("JADX is missing. Run install-tools or set APPUNPACK_JADX_JAR to the verified JAR.");
     throw error;
   }
   if (digest !== JADX.sha256) throw new Error("The selected JADX JAR does not match the pinned SHA-256. Run install-tools into a new directory.");
@@ -41,7 +45,7 @@ export function toolValue(reply) {
 
 export async function withEngine(apk, callback) {
   const jar = await selectedJar();
-  const client = new Client({ name: "apk-lens", version: "0.1.0" });
+  const client = new Client({ name: "appunpack", version: "0.1.0" });
   const transport = new StdioClientTransport({ command: javaCommand(), args: javaArgs(jar), stderr: "inherit" });
   try {
     await client.connect(transport, { timeout: 30_000 });
@@ -58,8 +62,23 @@ export async function withEngine(apk, callback) {
   }
 }
 
-export async function forwardProcess(command, args) {
-  const child = spawn(command, args, { stdio: "inherit", shell: false, windowsHide: true });
+export async function exportPackage(apk, output) {
+  const jar = await selectedJar();
+  const logPath = join(output, "decompile.log");
+  const log = await open(logPath, "wx");
+  try {
+    process.stderr.write(`Decompiling APK. Engine output: ${logPath}\n`);
+    const code = await forwardProcess(javaCommand(), [...javaOptions(), "-cp", jar,
+      join(root, "src", "Export.java"), apk, join(output, "decompiled")], ["ignore", log.fd, log.fd]);
+    if (code !== 0) throw new Error(`Decompilation failed (exit ${code}). See ${logPath}; full export requires a JDK with the jdk.compiler module.`);
+    return JSON.parse(await readFile(join(output, "decompiled", "export.json"), "utf8"));
+  } finally {
+    await log.close();
+  }
+}
+
+export async function forwardProcess(command, args, stdio = "inherit") {
+  const child = spawn(command, args, { stdio, shell: false, windowsHide: true });
   const onInt = () => child.kill("SIGINT");
   const onTerm = () => child.kill("SIGTERM");
   process.on("SIGINT", onInt);

@@ -303,7 +303,7 @@ def escape_markdown(value):
 
 
 def report_lines(evidence):
-    yield "# APK Lens: iOS static report\n"
+    yield "# AppUnpack: iOS static report\n"
     yield f"Input: {escape_markdown(evidence['input']['name'])}\n"
     yield f"SHA-256: {evidence['input']['sha256']}\n"
     yield f"Archive entries: {evidence['archive']['entries']}\n"
@@ -349,7 +349,7 @@ def main(argv=None):
         print(f"Report saved: {args.output.resolve()}")
         return 0
     except (OSError, ValueError, zipfile.BadZipFile, UnicodeError) as error:
-        print(f"apk-lens ipa: {error}", file=sys.stderr)
+        print(f"appunpack ipa: {error}", file=sys.stderr)
         return 1
 
 

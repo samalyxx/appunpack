@@ -8,18 +8,18 @@ Run the analysis engine on a computer. Use an Android emulator or a dedicated te
 
 This recommendation follows existing tool architectures: JADX provides a JVM CLI and desktop GUI; APKLab invokes separate JADX and Apktool processes; MobSF coordinates static analysis and a distinct runtime environment; Frida connects host tools to a running target. A phone-only implementation would add another platform and duplicate these integrations without improving static APK coverage. This is an architectural judgment, not a measured performance comparison.
 
-APK Lens implements its own CLI, reports and static IPA inspector. It calls separately installed JADX tools for Android bytecode work. APK Lens does not send application files to an AI service; material a user selects in an external AI workflow is governed by that workflow.
+AppUnpack implements its own CLI, reports and static IPA inspector. It calls separately installed JADX tools for Android bytecode work. AppUnpack does not send application files to an AI service; material a user selects in an external AI workflow is governed by that workflow.
 
 ## Repositories checked
 
 Actual GitHub searches included `android apk reverse engineering` and `ios reverse engineering`, ordered by stars. Results included Apktool, APKLab, APK Studio, apk.sh, OWASP MASTG and iOSAppReverseEngineering. The table focuses on projects with a concrete role in the design; it is not a ranking.
 
-| Project | Useful approach | Upstream license | Fit for APK Lens |
+| Project | Useful approach | Upstream license | Fit for AppUnpack |
 | --- | --- | --- | --- |
 | [JADX](https://github.com/skylot/jadx) | DEX-to-Java decompilation; resource decoding; CLI and GUI | Apache-2.0 | Separately installed Android analysis engine. Decompiled Java is a reconstruction and can be incomplete. |
 | [Apktool](https://github.com/iBotPeaches/Apktool) | Android resource/manifest decoding, smali disassembly and rebuilding | Apache-2.0 | Complementary optional tool. Decoding does not require rebuilding or re-signing the target. |
 | [APKLab](https://github.com/APKLab/APKLab) | VS Code workbench composing existing tools | AGPL-3.0 | Architecture reference: orchestrate tools rather than write another decompiler. |
-| [MobSF](https://github.com/MobSF/Mobile-Security-Framework-MobSF) | APK/IPA static reports and separate Android/iOS dynamic workflows | GPL-3.0-only in README | Broader assessment platform; not required by APK Lens. |
+| [MobSF](https://github.com/MobSF/Mobile-Security-Framework-MobSF) | APK/IPA static reports and separate Android/iOS dynamic workflows | GPL-3.0-only in README | Broader assessment platform; not required by AppUnpack. |
 | [Frida](https://github.com/frida/frida) | Instrumentation of running applications | wxWindows Library Licence 3.1 in root COPYING; components have their own notices | Optional separate runtime investigation with a compatible target setup. |
 | [Objection](https://github.com/sensepost/objection) | Interactive Android/iOS exploration built on Frida | GPL-3.0 in README | Optional separate runtime companion. Its no-jailbreak workflow still requires an instrumentable application/setup. |
 | [OWASP MASTG](https://github.com/OWASP/mastg) | Repeatable mobile testing and reverse-engineering methods | CC-BY-SA-4.0 | Methodology reference, not a runtime dependency. |
@@ -27,7 +27,7 @@ Actual GitHub searches included `android apk reverse engineering` and `ios rever
 | [class-dump](https://github.com/nygard/class-dump) | Objective-C declarations from Mach-O metadata | GPL-2.0-or-later in README | Historical metadata reference; it does not reconstruct implementations or Swift source. |
 | [ios-deploy](https://github.com/ios-control/ios-deploy) | Install/debug developer-signed iOS applications | GPL-3.0 reported by GitHub | Not a modern default: README targets iOS before version 17 and requires macOS/development signing. |
 
-These labels summarize the inspected upstream material and do not replace each project's full notices. APK Lens does not incorporate these projects' source code or bundle their executables.
+These labels summarize the inspected upstream material and do not replace each project's full notices. AppUnpack does not incorporate these projects' source code or bundle their executables.
 
 ## Source findings
 
@@ -39,7 +39,7 @@ These labels summarize the inspected upstream material and do not replace each p
 
 An IPA contains application bundles, but its executable is native Mach-O, not Android DEX. JADX and Apktool are not iOS decompilers.
 
-APK Lens's original Python inspector reads ZIP directory information and bounded XML/binary Info.plist metadata without extracting or executing the package. It records a SHA-256, archive sizes, application/extension declarations, URL schemes, usage descriptions and framework paths. It saves `evidence.json` and `report.md` in a new output directory. It does not decompile native code, check Mach-O encryption, verify code signatures, decode entitlements, or observe runtime behavior. Missing, encrypted, oversized or malformed plist metadata remains explicitly unavailable/unknown.
+AppUnpack's original Python inspector reads ZIP directory information and bounded XML/binary Info.plist metadata without extracting or executing the package. It records a SHA-256, archive sizes, application/extension declarations, URL schemes, usage descriptions and framework paths. It saves `evidence.json` and `report.md` in a new output directory. It does not decompile native code, check Mach-O encryption, verify code signatures, decode entitlements, or observe runtime behavior. Missing, encrypted, oversized or malformed plist metadata remains explicitly unavailable/unknown.
 
 The inspector rejects unsafe/duplicate paths, multi-disk archives and ZIP64. Limits include a 16 MiB central directory, 100,000 entries, 256 bundle plists, 2 MiB per plist and 8 MiB total plist input. Binary-plist table/reference checks bound parser allocation before using Python's standard `plistlib`. These budgets are resource limits, not proof that an application is safe.
 

@@ -1,6 +1,6 @@
 # Third-party notices
 
-APK Lens's own code is covered by its [MIT license](LICENSE). The tools and libraries it calls retain their own licenses and notices. Integration names identify the corresponding projects and do not imply affiliation or endorsement.
+AppUnpack's own code is covered by its [MIT license](LICENSE). The tools and libraries it calls retain their own licenses and notices. Integration names identify the corresponding projects and do not imply affiliation or endorsement.
 
 | Project | Role | License |
 | --- | --- | --- |
@@ -14,4 +14,4 @@ The repository does not bundle Java, Python, target applications or the engine J
 
 The installed MCP client declares Apache-2.0 and includes transition terms: contributions without permission to relicense remain under their original MIT terms. Its complete installed license controls those qualifications; the summary above does not replace it.
 
-The lockfile records npm dependencies and transitive versions; retain the license files included with those installed packages when redistributing them. APK Lens's MIT license grants no rights to target APKs/IPAs or other third-party software.
+The lockfile records npm dependencies and transitive versions; retain the license files included with those installed packages when redistributing them. AppUnpack's MIT license grants no rights to target APKs/IPAs or other third-party software.
