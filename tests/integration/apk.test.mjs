@@ -63,7 +63,7 @@ test("an APK alone exports source/resources and protects previous evidence", opt
   assert.match(inspection.manifest, /io\.appium\.android\.apis/);
 
   const output = defaultOutput(apk);
-  await cli([apk]);
+  const exportedRun = await cli([apk]);
   const savedText = await readFile(join(output, "evidence.json"), "utf8");
   const saved = JSON.parse(savedText);
   assert.equal(saved.schema_version, 1);
@@ -78,9 +78,13 @@ test("an APK alone exports source/resources and protects previous evidence", opt
   assert.deepEqual(exported, saved.decompilation);
   assert.ok(exported.classes > 0);
   assert.equal(exported.status, exported.errors > 0 || exported.warnings > 0 ? "partial" : "completed");
+  assert.ok(exportedRun.stderr.includes(`Export ${exported.status}: ${exported.errors} errors, ${exported.warnings} warnings.`));
   assert.equal(typeof exported.version, "string");
   assert.ok(exported.version.length > 0);
-  assert.match(await readFile(join(output, "decompiled", "sources", "io", "appium", "android", "apis", "ApiDemos.java"), "utf8"), /class ApiDemos/);
+  const source = await readFile(join(output, "decompiled", "sources", "io", "appium", "android", "apis", "ApiDemos.java"), "utf8");
+  assert.match(source, /class ApiDemos/);
+  assert.match(source, /void onCreate\(/);
+  assert.match(source, /getIntent\(\)/);
   assert.match(await readFile(join(output, "decompiled", "resources", "AndroidManifest.xml"), "utf8"), /io\.appium\.android\.apis/);
   assert.equal(typeof await readFile(join(output, "decompile.log"), "utf8"), "string");
   assert.match(await readFile(join(output, "report.md"), "utf8"), /io\.appium\.android\.apis/);

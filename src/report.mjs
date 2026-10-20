@@ -30,6 +30,7 @@ export async function analyze(apk, directory = defaultOutput(apk)) {
   try {
     const before = await sha256(path);
     const decompilation = await exportPackage(path, output);
+    process.stderr.write(`Export ${decompilation.status}: ${decompilation.errors} errors, ${decompilation.warnings} warnings. Review decompile.log.\n`);
     process.stderr.write("Collecting manifest and app declarations...\n");
     const analysis = await withEngine(path, inspectPackage);
     if (before !== await sha256(path)) throw new Error("The APK changed during analysis; report was not saved.");
