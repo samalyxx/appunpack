@@ -75,7 +75,7 @@ export async function exportPackage(apk, output) {
       { timeoutMs: 600_000, maxOutputBytes: 16 * 1024 * 1024, logPath });
     return JSON.parse(await readFile(join(output, "decompiled", "export.json"), "utf8"));
   } catch (error) {
-    throw new Error(`${error.message}\nSee ${logPath}; full export requires a JDK with the jdk.compiler module.`, { cause: error });
+    throw new Error(`${error.message}\nSee ${logPath} for the full engine diagnostics.`, { cause: error });
   }
 }
 

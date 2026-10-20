@@ -42,6 +42,8 @@ This creates `Uber-analysis` beside the input file. On Windows you can use `.\ap
 
 The output contains `report.md`, `evidence.json`, `manifest.xml`, `decompiled/sources/`, `decompiled/resources/`, `decompiled/export.json` and `decompile.log`. Start with the report and export status, then browse the Java files and decoded resources. Warnings and export errors can mean partial output even when useful files were retained.
 
+Full APK and split exports disable JADX's `finally`-block reconstruction to avoid excessive memory use on complex exception paths. `export.json` and `evidence.json` record `extract_finally: false`; cleanup code may remain duplicated in the reconstructed Java. Class/method queries and MCP use the upstream engine's separate configuration. This setting does not guarantee complete or behaviorally equivalent recovery.
+
 To choose a destination:
 
 ```sh

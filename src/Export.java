@@ -42,6 +42,8 @@ public class Export {
         options.setOutDir(output.toFile());
         options.setThreadsCount(1);
         options.setCodeCache(NoOpCodeCache.INSTANCE);
+        // Avoid unbounded path permutations when reconstructing complex finally blocks.
+        options.setExtractFinally(false);
         try (JadxDecompiler jadx = new JadxDecompiler(options)) {
             jadx.load();
             jadx.save();
@@ -64,6 +66,7 @@ public class Export {
                   "engine": "jadx",
                   "version": "%s",
                   "status": "%s",
+                  "extract_finally": false,
                   "classes": %d,
                   "resources": %d,
                   "errors": %d,

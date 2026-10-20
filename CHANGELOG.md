@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Disable JADX finally-block reconstruction during full APK/split export to avoid excessive path-permutation memory use. Record the setting in export evidence; reconstructed cleanup code may remain duplicated.
+- Preserve the actual export error and diagnostic log path without appending an unrelated JDK diagnosis to every failure.
+
 ## 0.2.1 — 2026-10-21
 
 - Accept valid case-distinct resource paths during native inventory, exact-member extraction and opaque split APK copying. Continue rejecting exact duplicate entries and unsafe whole-archive extraction collisions.
