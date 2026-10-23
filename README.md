@@ -196,6 +196,8 @@ The current installation method is a GitHub source checkout or release archive f
 
 ## Documentation
 
+- [Decompile an APK locally](https://samalyxx.github.io/appunpack/guides/decompile-apk/): setup, exported files and partial-result checks.
+- [Analyze split APKs and XAPK](https://samalyxx.github.io/appunpack/guides/split-apk-xapk/): compatible sets, commands and per-part evidence.
 - [Installation](docs/installation.md): requirements, engine verification and platform setup.
 - [Commands and outputs](docs/usage.md): APK and IPA workflows, flags and report contracts.
 - [AI agent setup](docs/agents.md): local MCP configuration and investigation prompts.

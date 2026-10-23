@@ -5,15 +5,23 @@ The public project website is [samalyxx.github.io/appunpack](https://samalyxx.gi
 ## Included metadata
 
 - A descriptive page title, meta description and one main heading identify the project and its actual purpose.
-- A canonical URL points to `https://samalyxx.github.io/appunpack/`.
+- Each page has its own canonical URL under `https://samalyxx.github.io/appunpack/`.
 - Open Graph and social-card metadata describe the page when it is shared.
 - Crawlable HTML explains APK decompilation, decoded resources, local analysis, MCP integration and the limits of IPA metadata support.
-- `sitemap.xml` lists the canonical project page. README and website links connect installation guides, verification evidence and release downloads.
+- `sitemap.xml` lists the homepage and two practical guides: [APK decompilation](https://samalyxx.github.io/appunpack/guides/decompile-apk/) and [split APK/XAPK analysis](https://samalyxx.github.io/appunpack/guides/split-apk-xapk/). The guides have article and breadcrumb metadata, and link to each other, the homepage and the source documentation.
 - The repository description and relevant GitHub topics help people find the project on GitHub.
 
 The README uses the same product name, clear headings, descriptive image alternatives and a practical quick start. Keep the website, package metadata and README consistent when capabilities change.
 
 Google reads `robots.txt` at the [host root](https://developers.google.com/search/docs/crawling-indexing/robots/create-robots-txt), `https://samalyxx.github.io/robots.txt`. A file under `/appunpack/robots.txt` cannot set crawling rules for this project site. The project does not require a robots exclusion rule; verify the host's root rules if crawling is blocked.
+
+## Visibility audit on 2026-10-23
+
+The public homepage, sitemap and social image returned HTTP 200. The homepage had crawlable static HTML, an indexing-permitted robots meta tag and no `X-Robots-Tag` response header. Existing canonical and social metadata were present. These checks did not identify a technical indexing prohibition; they do not establish that Google has indexed the page.
+
+GitHub's repository search returned `samalyxx/appunpack` for `appunpack in:name`. The repository was created on 2026-10-20. Finding a new repository by its name and ranking for a broad competitive phrase are different checks. The GitHub topic page in the reported Google result is a collection of repositories, not an individual project's search position.
+
+The changes add the two crawlable guides, internal and README links, a complete sitemap and clearer APK-decompiler metadata. They also correct Python prerequisites and split-set wording. The repository description and topics now include relevant terms such as `android-reverse-engineering`, `apk-decompiler` and `mcp-server`. Topic classification helps discovery on GitHub; it does not guarantee placement in Google or GitHub search.
 
 ## Google Search Console
 
@@ -22,7 +30,7 @@ Google decides whether and when a page is indexed. Valid metadata, a sitemap and
 After the Pages deployment is public:
 
 1. Open [Google Search Console](https://search.google.com/search-console/) with your Google account and add the URL-prefix property `https://samalyxx.github.io/appunpack/`.
-2. Use one of the [ownership verification methods](https://support.google.com/webmasters/answer/9008080) offered for that property. For an HTML-file or meta-tag method, add the exact token Google supplies to the site and redeploy. No verification token is included in this repository.
+2. Use one of the [ownership verification methods](https://support.google.com/webmasters/answer/9008080) offered for that property. The homepage includes the owner's public verification meta tag. Preserve it to maintain verification. If another owner needs to verify access, use that owner's exact token and Google's verification instructions.
 3. Submit `https://samalyxx.github.io/appunpack/sitemap.xml` in the property's Sitemaps report. Google's [sitemap overview](https://developers.google.com/search/docs/crawling-indexing/sitemaps/overview) explains why a sitemap helps discovery but does not guarantee crawling or indexing.
 4. Inspect the homepage URL with URL Inspection. Check the live URL and request indexing if the interface permits it.
 5. Review indexing and search-performance reports after Google has had time to crawl the page. Correct reported problems and keep useful documentation current.

@@ -3,16 +3,17 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AppUnpack — Android APK reverse engineering with JADX</title>
-  <meta name="description" content="Reverse engineer Android APKs locally with AppUnpack. Export decompiled Java, decoded resources, manifests and evidence reports, or connect your AI agent through MCP.">
+  <title>AppUnpack: Android APK Decompiler &amp; Reverse Engineering</title>
+  <meta name="description" content="Decompile Android APKs locally with AppUnpack and JADX. Inspect Java, resources, manifests and split APKs, save evidence reports, or connect AI agents through MCP.">
   <meta name="robots" content="index, follow, max-image-preview:large">
+  <meta name="google-site-verification" content="k4QSYSI9IlJGCF3RwkWf4ySixEvvCuryf1KMfzAIKfA">
   <meta name="theme-color" content="#0b1017">
   <link rel="canonical" href="https://samalyxx.github.io/appunpack/">
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="styles.css">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="AppUnpack">
-  <meta property="og:title" content="AppUnpack — Android APK reverse engineering">
+  <meta property="og:title" content="AppUnpack: Android APK Decompiler &amp; Reverse Engineering">
   <meta property="og:description" content="One APK. Decompiled code, decoded resources and evidence. A local CLI built on JADX, with optional AI-agent integration.">
   <meta property="og:url" content="https://samalyxx.github.io/appunpack/">
   <meta property="og:image" content="https://samalyxx.github.io/appunpack/assets/social-card.png">
@@ -20,7 +21,7 @@
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="AppUnpack: Android APK reverse engineering. One APK. Code, resources, evidence.">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="AppUnpack — Android APK reverse engineering">
+  <meta name="twitter:title" content="AppUnpack: Android APK Decompiler &amp; Reverse Engineering">
   <meta name="twitter:description" content="Export Java, resources and a local evidence report from an Android APK.">
   <meta name="twitter:image" content="https://samalyxx.github.io/appunpack/assets/social-card.png">
   <script type="application/ld+json">
@@ -32,7 +33,7 @@
     "description": "A local Android APK reverse-engineering CLI that exports decompiled Java, decoded resources, manifests and evidence reports using JADX.",
     "applicationCategory": "DeveloperApplication",
     "operatingSystem": "Windows, Linux, macOS",
-    "softwareRequirements": "Node.js 24.11 or newer; Java 17 or newer JDK with compiler modules. Python 3.10 or newer for optional IPA metadata inspection.",
+    "softwareRequirements": "Node.js 24.11 or newer; Java 17 or newer JDK with compiler modules. Python 3.10 or newer for split APK analysis, APK preflight, native extraction and IPA metadata inspection.",
     "softwareVersion": "0.2.1",
     "license": "https://github.com/samalyxx/appunpack/blob/main/LICENSE",
     "downloadUrl": "https://github.com/samalyxx/appunpack/releases/tag/v0.2.1",
@@ -46,14 +47,14 @@
   <a class="skip" href="#main">Skip to content</a>
   <header class="site-header wrap">
     <a class="brand" href="./" aria-label="AppUnpack home"><img src="assets/favicon.svg" width="34" height="34" alt="">AppUnpack<span class="version">v0.2.1</span></a>
-    <nav aria-label="Main navigation"><a href="#how-it-works">How it works</a><a href="#quick-start">Get started</a><a href="#faq">FAQ</a><a class="nav-github" href="https://github.com/samalyxx/appunpack">GitHub <span aria-hidden="true">↗</span></a></nav>
+    <nav aria-label="Main navigation"><a href="#how-it-works">How it works</a><a href="#quick-start">Get started</a><a href="#guides">Guides</a><a class="nav-github" href="https://github.com/samalyxx/appunpack">GitHub <span aria-hidden="true">↗</span></a></nav>
   </header>
   <main id="main">
     <section class="hero wrap">
       <div class="hero-copy">
         <p class="eyebrow"><span class="status-dot"></span> OPEN SOURCE · LOCAL ANALYSIS · MIT</p>
         <h1>Android APK<br>reverse engineering.<br><span>Unpack the evidence.</span></h1>
-        <p class="intro">Give AppUnpack an APK. Get readable Java, decoded resources and a report that keeps the evidence and its limits together.</p>
+        <p class="intro">Give AppUnpack an APK. Its local APK decompiler workflow uses JADX to recover Java and decoded resources, with a report that keeps the evidence and its limits together.</p>
         <div class="actions"><a class="button primary" href="#quick-start">Start with your APK <span aria-hidden="true">↘</span></a><a class="button secondary" href="https://github.com/samalyxx/appunpack/releases/tag/v0.2.1">Download v0.2.1 <span aria-hidden="true">↗</span></a></div>
         <p class="micro">Runs on your computer. No AI account required.</p>
       </div>
@@ -75,7 +76,7 @@
       <div class="example-caption"><p><strong>These are derived files, not the original project.</strong> Decompiled methods can be incomplete or inaccurate. The illustration above summarizes a real test; it is not a product GUI.</p><a href="https://github.com/samalyxx/appunpack/blob/main/docs/testing.md">Read the verification record <span aria-hidden="true">↗</span></a></div>
     </div></section>
     <section class="section wrap" id="quick-start">
-      <div class="section-heading"><div><p class="eyebrow">03 / QUICK START</p><h2>Your APK. Your workspace.</h2></div><p>Install Node.js 24.11+, npm, Git and a Java 17+ JDK with compiler modules. Python 3.10+ is optional for IPA metadata.</p></div>
+      <div class="section-heading"><div><p class="eyebrow">03 / QUICK START</p><h2>Your APK. Your workspace.</h2></div><p>Install Node.js 24.11+, npm, Git and a Java 17+ JDK with compiler modules. Add Python 3.10+ for split APKs, APK preflight, native extraction or IPA metadata.</p></div>
       <div class="start-grid"><div class="code-panel"><div class="panel-label">INSTALL FROM SOURCE</div><pre><code>git clone https://github.com/samalyxx/appunpack.git
 cd appunpack
 npm ci
@@ -84,11 +85,15 @@ node bin/appunpack.mjs ./Example.apk</code></pre><p>The engine download is pinne
     </section>
     <section class="agent-section wrap" id="agents"><div><p class="eyebrow">OPTIONAL / AI CODING AGENTS</p><h2>Ask a question.<br>Trace the implementation.</h2><p>Connect a compatible MCP client to inspect classes, methods and references. Keep the APK hash and distinguish returned evidence from the agent's interpretation.</p><a class="text-link" href="https://github.com/samalyxx/appunpack/blob/main/docs/agents.md">Connect your agent <span aria-hidden="true">↗</span></a></div><div class="agent-code"><p class="panel-label">PRINT YOUR LOCAL MCP CONFIGURATION</p><pre><code>node bin/appunpack.mjs mcp-config</code></pre><blockquote>“Find the search implementation in this APK. Trace its callers and explain the behavior with evidence and limitations.”</blockquote><p class="micro">A cloud AI client can receive the tool output it requests under that client's own data policy.</p></div></section>
     <section class="section wrap" id="coverage"><div class="section-heading"><div><p class="eyebrow">04 / COVERAGE</p><h2>Know what you're getting.</h2></div><p>Static APK reverse engineering is a starting point for investigation. AppUnpack makes the boundaries visible.</p></div><div class="table-scroll"><table><caption class="sr-only">AppUnpack analysis capabilities and current limits</caption><thead><tr><th scope="col">Target or workflow</th><th scope="col">Current support</th><th scope="col">What to expect</th></tr></thead><tbody><tr><th scope="row">Android APK</th><td><span class="tag supported">Supported</span></td><td>Derived Java, decoded resources, manifest, evidence and report.</td></tr><tr><th scope="row">Class / method investigation</th><td><span class="tag supported">Supported</span></td><td>CLI queries and optional stdio MCP integration through JADX.</td></tr><tr><th scope="row">iOS IPA</th><td><span class="tag limited">Metadata only</span></td><td>Archive and bundle plist inventory; no executable decompilation.</td></tr><tr><th scope="row">Split APK sets</th><td><span class="tag supported">Supported</span></td><td>Compatible base/split sets analyzed together; per-part resources retained. No installable merged APK.</td></tr><tr><th scope="row">Apktool / Ghidra</th><td><span class="tag limited">Optional tools</span></td><td>Smali/resource decoding and selected native ELF pseudocode. Separate tool setup required.</td></tr><tr><th scope="row">ADB / Frida</th><td><span class="tag limited">Optional tools</span></td><td>Package extraction, bounded device logs and explicit process/script captures.</td></tr></tbody></table></div><p><a class="text-link" href="https://github.com/samalyxx/appunpack/blob/main/docs/android-workflows.md">Set up extended Android workflows <span aria-hidden="true">↗</span></a></p></section>
-    <section class="section faq-section wrap" id="faq"><div><p class="eyebrow">05 / COMMON QUESTIONS</p><h2>Before you unpack.</h2></div><div class="faqs">
+    <section class="section wrap" id="guides">
+      <div class="section-heading"><div><p class="eyebrow">05 / PRACTICAL GUIDES</p><h2>From APK to an explanation.</h2></div><p>Follow the complete local workflow, choose the right input files and learn how to assess recovered code.</p></div>
+      <div class="feature-grid guide-links"><article><span class="feature-number">SINGLE APK</span><h3><a href="guides/decompile-apk/">How to decompile an Android APK</a></h3><p>Install the engine, export Java and resources, trace methods and check partial results.</p><a class="text-link" href="guides/decompile-apk/">Read the APK decompilation guide <span aria-hidden="true">↗</span></a></article><article><span class="feature-number">SPLIT APK / XAPK / APKS</span><h3><a href="guides/split-apk-xapk/">Analyze an app with multiple APKs</a></h3><p>Prepare compatible splits, collect an installed package with ADB and preserve each part's resources and hashes.</p><a class="text-link" href="guides/split-apk-xapk/">Read the split APK and XAPK guide <span aria-hidden="true">↗</span></a></article></div>
+    </section>
+    <section class="section faq-section wrap" id="faq"><div><p class="eyebrow">06 / COMMON QUESTIONS</p><h2>Before you unpack.</h2></div><div class="faqs">
       <details><summary>Is this a real APK decompiler?</summary><p>AppUnpack uses JADX's decompiler API to load APK bytecode and save reconstructed Java and decoded resources. It adds a local command, evidence reports and optional agent integration. It does not implement a new decompiler.</p></details>
       <details><summary>Can it recover 100% of an app?</summary><p>No. Obfuscation, unsupported constructs, native libraries and missing modules can leave gaps. Even output without reported errors is not proof of correct source recovery. The original source project and server-side backend cannot be recovered from an APK.</p></details>
       <details><summary>Does my APK get uploaded?</summary><p>The default export runs on your computer. No AI account is required. Setup downloads dependencies and the engine; it does not upload your APK. If you connect a cloud AI client, tool responses follow that client's data policy.</p></details>
-      <details><summary>Can I give it an app name or Play Store link?</summary><p>Provide an actual APK file that you are authorized to analyze. AppUnpack does not download apps by name or merge Play Store split APKs. A lone base APK may omit code and resources.</p></details>
+      <details><summary>Can I give it an app name or Play Store link?</summary><p>Provide APK files that you are authorized to analyze. AppUnpack does not download apps by name. It can analyze compatible base/split sets together, including supported XAPK/APKS collections, but does not create an installable merged APK. A lone base APK may omit code and resources. Follow the <a class="text-link" href="guides/split-apk-xapk/">split APK guide</a> to select the right files.</p></details>
       <details><summary>What does “partial” mean?</summary><p>The engine reported errors or warnings. Useful files may still exist. Review the counters, affected source files and <code>decompile.log</code> before relying on a result.</p></details>
       <details><summary>Is this an online APK analyzer?</summary><p>No. This website explains the tool and links to its source release. Analysis happens in your local CLI; there is no APK upload form or hosted analysis service.</p></details>
     </div></section>

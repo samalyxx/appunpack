@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Analyze split APKs, XAPK and APKS locally | AppUnpack</title>
+  <meta name="description" content="Analyze compatible Android split APKs, XAPK and APKS collections with AppUnpack. Select a base/split set, export Java and preserve each part's resources and hashes.">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <meta name="theme-color" content="#0b1017">
+  <link rel="canonical" href="https://samalyxx.github.io/appunpack/guides/split-apk-xapk/">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../../styles.css">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="AppUnpack">
+  <meta property="og:title" content="Analyze split APKs, XAPK and APKS locally">
+  <meta property="og:description" content="Prepare one compatible base/split set, inspect combined JADX output and retain each APK's identity and resources.">
+  <meta property="og:url" content="https://samalyxx.github.io/appunpack/guides/split-apk-xapk/">
+  <meta property="og:image" content="https://samalyxx.github.io/appunpack/assets/social-card.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="AppUnpack: local Android APK reverse engineering with code, resources and evidence.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Analyze split APKs, XAPK and APKS locally">
+  <meta name="twitter:description" content="A practical guide to compatible split APK sets, per-part resources and the limits of XAPK/APKS analysis.">
+  <meta name="twitter:image" content="https://samalyxx.github.io/appunpack/assets/social-card.png">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "TechArticle",
+        "headline": "Analyze split APKs, XAPK and APKS locally",
+        "description": "Prepare one compatible base/split set, inspect combined JADX output and retain each APK's identity and resources.",
+        "url": "https://samalyxx.github.io/appunpack/guides/split-apk-xapk/",
+        "mainEntityOfPage": "https://samalyxx.github.io/appunpack/guides/split-apk-xapk/",
+        "inLanguage": "en",
+        "image": "https://samalyxx.github.io/appunpack/assets/social-card.png",
+        "author": { "@type": "Person", "name": "samalyxx", "url": "https://github.com/samalyxx" },
+        "about": { "@type": "SoftwareApplication", "name": "AppUnpack", "url": "https://samalyxx.github.io/appunpack/", "applicationCategory": "DeveloperApplication", "operatingSystem": "Windows, Linux, macOS" }
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "AppUnpack", "item": "https://samalyxx.github.io/appunpack/" },
+          { "@type": "ListItem", "position": 2, "name": "Split APK and XAPK analysis", "item": "https://samalyxx.github.io/appunpack/guides/split-apk-xapk/" }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header wrap">
+    <a class="brand" href="../../" aria-label="AppUnpack home"><img src="../../assets/favicon.svg" width="34" height="34" alt="">AppUnpack</a>
+    <nav aria-label="Main navigation"><a href="../../#quick-start">Get started</a><a href="../decompile-apk/">APK guide</a><a class="nav-github" href="https://github.com/samalyxx/appunpack">GitHub <span aria-hidden="true">↗</span></a></nav>
+  </header>
+  <main id="main" class="wrap guide">
+    <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="../../">AppUnpack</a><span aria-hidden="true"> / </span><span aria-current="page">Split APK and XAPK analysis</span></nav>
+    <article class="guide-content">
+      <header class="guide-heading"><h1>Analyze split APKs, XAPK and APKS locally</h1><p class="intro">An Android app can ship as a base APK plus configuration or feature splits. AppUnpack analyzes a compatible set together and keeps evidence for each supplied part.</p></header>
+      <section aria-labelledby="choose-input">
+        <h2 id="choose-input">Choose the correct input set</h2>
+        <p>A base APK alone may omit code, language strings, device resources or native libraries. Collect one app version's base APK and relevant splits before drawing conclusions about missing content. AppUnpack accepts a flat APK directory or an unambiguous <code>.xapk</code>/<code>.apks</code> collection you are authorized to inspect.</p>
+        <p>The extension does not establish that every contained APK belongs together. A bundletool archive with <code>toc.pb</code> may contain alternative device variants and is refused. First use upstream <a href="https://developer.android.com/tools/bundletool#extract-apks">bundletool extract-apks</a> to select a device-specific set, then analyze that extracted directory. AppUnpack does not convert an AAB or create an installable merged APK.</p>
+      </section>
+      <section aria-labelledby="setup">
+        <h2 id="setup">Install the split-analysis prerequisites</h2>
+        <p>Install Git, Node.js 24.11 or newer, npm, a Java 17 or newer JDK with compiler modules, and Python 3.10 or newer. Follow the <a href="../decompile-apk/">APK decompilation guide</a> for the initial checkout and <code>install-tools</code> command. The pinned JADX engine performs decompilation; Python prepares and checks the APK set.</p>
+        <p>If Python is not resolved correctly, set <code>APPUNPACK_PYTHON</code> to your executable's absolute path. For example, in PowerShell:</p>
+        <pre><code>$env:APPUNPACK_PYTHON = 'C:\Python312\python.exe'
+node bin/appunpack.mjs doctor</code></pre>
+        <p>Replace that sample path with your installed Python. <code>doctor</code> checks the Java/JADX connection, not whether a particular collection is complete or compatible.</p>
+      </section>
+      <section aria-labelledby="analyze">
+        <h2 id="analyze">Analyze a directory or archive</h2>
+        <p>For a directory input, keep the selected APKs directly inside one folder. Run one command from the AppUnpack checkout:</p>
+        <pre><code>node bin/appunpack.mjs splits ./apk-set --output ./reports/split-analysis</code></pre>
+        <p>For an archive, use its actual path. These are alternative examples; each destination must be new:</p>
+        <pre><code>node bin/appunpack.mjs splits ./Example.xapk --output ./reports/xapk-analysis
+node bin/appunpack.mjs splits ./Example.apks --output ./reports/apks-analysis</code></pre>
+        <p><code>--output</code> is required. The direct form <code>node bin/appunpack.mjs ./Example.xapk --output ./reports/xapk-analysis</code> also selects split analysis. No other analysis flags are supported by <code>splits</code>. Existing output directories are preserved, including partial output from failed attempts.</p>
+        <p>Preparation copies the APK members into owned <code>inputs/</code>, records SHA-256 values and checks for exactly one base, matching package/version identifiers, unique split names and referenced feature splits. Unsafe paths, duplicate entries and unsupported archive layouts are refused before combined analysis.</p>
+      </section>
+      <section aria-labelledby="read-output">
+        <h2 id="read-output">Inspect combined code and per-part resources</h2>
+        <div class="table-scroll"><table><caption>Where to inspect a split analysis</caption><thead><tr><th scope="col">Output</th><th scope="col">Meaning</th></tr></thead><tbody>
+          <tr><th scope="row"><code>report.md</code></th><td>Collected-set summary, results and limitations.</td></tr>
+          <tr><th scope="row"><code>evidence.json</code></th><td>Base-first <code>parts</code> list, identities and hashes.</td></tr>
+          <tr><th scope="row"><code>decompiled/sources/</code></th><td>Reconstructed Java from the APKs supplied together to JADX.</td></tr>
+          <tr><th scope="row"><code>decompiled/resources/</code></th><td>Resources returned by the combined export.</td></tr>
+          <tr><th scope="row"><code>decompiled/part-resources/</code></th><td>For multi-APK sets, each part's decoded resources in <code>part-000/</code>, <code>part-001/</code> and subsequent directories.</td></tr>
+          <tr><th scope="row"><code>manifest.xml</code></th><td>Base APK manifest; it is not a merged manifest for the entire set.</td></tr>
+          <tr><th scope="row"><code>decompiled/export.json</code> and logs</th><td>Completion status and diagnostics for partial results.</td></tr>
+        </tbody></table></div>
+        <p>Resource paths can overlap between splits. Use the per-part directories to preserve those distinctions; their numbering follows the <code>parts</code> list. Keep the report alongside recovered files so a reader can identify which artifacts produced a finding.</p>
+      </section>
+      <section aria-labelledby="device">
+        <h2 id="device">Collect an installed app with ADB</h2>
+        <p>With separately installed Android SDK Platform Tools and a device that has authorized your computer, list devices and explicitly select the correct serial:</p>
+        <pre><code>node bin/appunpack.mjs devices
+node bin/appunpack.mjs pull com.example.app --device emulator-5554 --output ./reports/pulled
+node bin/appunpack.mjs splits ./reports/pulled --output ./reports/pulled-analysis</code></pre>
+        <p>Replace the sample package and serial. <code>pull</code> copies base/split paths reported by that package manager and records local hashes. It does not install or launch the app. An update during transfer can invalidate the set; repeat collection if its identities no longer agree.</p>
+      </section>
+      <section aria-labelledby="limits">
+        <h2 id="limits">Treat completeness as a separate question</h2>
+        <p>Matching package and version declarations do not verify signatures, device compatibility or that every required module was supplied. Expansion OBB payloads are not analyzed. Java recovery can remain partial even for a consistent set, and recovered code does not include the app's backend.</p>
+        <p>Read the <a href="https://github.com/samalyxx/appunpack/blob/main/docs/android-workflows.md">extended Android workflow reference</a> for size limits and tool setup. Return to the <a href="../../#coverage">coverage table</a> or <a href="https://github.com/samalyxx/appunpack/blob/main/docs/testing.md">verification record</a> to check what has actually been tested.</p>
+      </section>
+    </article>
+  </main>
+  <footer class="site-footer wrap"><div class="footer-brand"><strong>AppUnpack</strong><p>Local Android APK reverse engineering.<br>Built on JADX. Made by <a href="https://github.com/samalyxx">samalyxx</a>.</p></div><nav aria-label="Footer navigation"><a href="../../">Home</a><a href="../decompile-apk/">APK guide</a><a href="https://github.com/samalyxx/appunpack/blob/main/docs/usage.md">Documentation</a><a href="https://github.com/samalyxx/appunpack/issues">Report an issue</a><a href="https://github.com/samalyxx/appunpack/blob/main/THIRD_PARTY_NOTICES.md">Licenses</a></nav><p class="footer-note">Analyze software you own or are authorized to examine. Keep private APKs and analysis output out of public commits.</p></footer>
+</body>
+</html>

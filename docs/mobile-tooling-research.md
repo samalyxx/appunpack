@@ -18,6 +18,7 @@ Actual GitHub searches included `android apk reverse engineering` and `ios rever
 | --- | --- | --- | --- |
 | [JADX](https://github.com/skylot/jadx) | DEX-to-Java decompilation; resource decoding; CLI and GUI | Apache-2.0 | Separately installed Android analysis engine. Decompiled Java is a reconstruction and can be incomplete. |
 | [Apktool](https://github.com/iBotPeaches/Apktool) | Android resource/manifest decoding, smali disassembly and rebuilding | Apache-2.0 | Complementary optional tool. Decoding does not require rebuilding or re-signing the target. |
+| [apk.sh](https://github.com/ax/apk.sh) | Bash orchestration of Apktool, ADB, rebuilding, signing and Frida Gadget patching | [GPL-3.0](https://github.com/ax/apk.sh/blob/2a1ed25e861dacfb4fec1aef7b099813abff24ed/LICENSE) | Separate workflow for producing modified APKs; AppUnpack retains supplied APK parts for analysis. No source code incorporated. |
 | [APKLab](https://github.com/APKLab/APKLab) | VS Code workbench composing existing tools | AGPL-3.0 | Architecture reference: orchestrate tools rather than write another decompiler. |
 | [Androguard](https://github.com/androguard/androguard) | APK/DEX parsing, disassembly, decompilation and references through modular libraries | Apache-2.0 | Independent analysis toolkit and source-backed test corpus; not a dependency. |
 | [MobSF](https://github.com/MobSF/Mobile-Security-Framework-MobSF) | APK/IPA static reports and separate Android/iOS dynamic workflows | GPL-3.0-only in README | Broader assessment platform; not required by AppUnpack. |
@@ -30,6 +31,12 @@ Actual GitHub searches included `android apk reverse engineering` and `ios rever
 | [ios-deploy](https://github.com/ios-control/ios-deploy) | Install/debug developer-signed iOS applications | GPL-3.0 reported by GitHub | Not a modern default: README targets iOS before version 17 and requires macOS/development signing. |
 
 These labels summarize the inspected upstream material and do not replace each project's full notices. AppUnpack does not incorporate these projects' source code or bundle their executables.
+
+## Choosing an APK workflow
+
+The apk.sh comparison was checked on 2026-10-23 at commit `2a1ed25e861dacfb4fec1aef7b099813abff24ed`. Its [`pull` workflow](https://github.com/ax/apk.sh/blob/2a1ed25e861dacfb4fec1aef7b099813abff24ed/apk.sh#L527-L650) can combine installed split APKs by decoding their contents, updating resources and rebuilding a single APK. Its [build/sign functions](https://github.com/ax/apk.sh/blob/2a1ed25e861dacfb4fec1aef7b099813abff24ed/apk.sh#L231-L274) align and re-sign the result; its [patch function](https://github.com/ax/apk.sh/blob/2a1ed25e861dacfb4fec1aef7b099813abff24ed/apk.sh#L276-L525) adds Frida Gadget.
+
+Choose AppUnpack to inspect reconstructed Java, smali, resources, native pseudocode and evidence while retaining the supplied packages. Its `pull` copies the base and split APKs separately, and `splits` analyzes a compatible set together without rebuilding it. Choose a separate rebuilding or Gadget workflow when you need a modified test artifact. Re-signing changes the signing identity; a modified APK is a different artifact and may behave differently. These apk.sh capabilities were reviewed in source, not executed during this comparison.
 
 ## Source findings
 
@@ -59,4 +66,4 @@ Runtime iOS analysis needs a suitable physical/virtual device and compatible ins
 
 Repository searches, documents, license statements and the linked source entry points were checked. The source links pin the reviewed revisions. The IPA inspector has synthetic standard-library regression tests for XML/binary metadata, actual CLI output, archive/path budgets, malformed/encrypted/oversized metadata, output escaping and refusal to overwrite an existing destination.
 
-The initial research did not execute physical-device instrumentation, iOS virtual devices, FairPlay decryption, macOS signature checks or a cross-platform benchmark. Subsequent v0.2 verification covered ADB on a read-only Android emulator, Frida on an isolated Windows host process, Apktool, Ghidra and synthetic split sets. Android Frida server/Gadget attachment and real Play Store split compatibility remain unverified. Source-derived capability descriptions do not establish that a particular target can be fully analyzed. See the README for the project's actual completed validation.
+The initial research did not execute physical-device instrumentation, iOS virtual devices, FairPlay decryption, macOS signature checks or a cross-platform benchmark. Subsequent v0.2 verification covered ADB on a read-only Android emulator, Frida on an isolated Windows host process, Apktool, Ghidra and synthetic split sets. Later [launch checks](testing.md#android-frida-attachment) verified x86_64 Android Frida server attachment to ApiDemos on an isolated rooted API 36 emulator and an install/pull/hash/analysis round trip for Jellyfin release-derived splits; physical devices, ARM64 runtime attachment, Frida Gadget, application-specific hooks and genuine Play Store-delivered split sets remain unverified. Source-derived capability descriptions do not establish that a particular target can be fully analyzed. See the README for the project's actual completed validation.

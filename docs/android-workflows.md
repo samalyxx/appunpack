@@ -42,6 +42,8 @@ Open `report.md`, `evidence.json`, `decompiled/sources/`, `decompiled/resources/
 
 This is combined analysis, **not an installable merged APK**. It does not establish signature validity, device compatibility or that every required split was supplied. Expansion OBB payloads are not analyzed. A bundletool archive containing `toc.pb` can hold alternative device variants and is refused; first select a device-specific set with upstream [bundletool extract-apks](https://developer.android.com/tools/bundletool#extract-apks), then analyze the extracted directory. AAB conversion and APK rebuilding/signing remain outside this workflow.
 
+See [choosing an APK workflow](mobile-tooling-research.md#choosing-an-apk-workflow) for the distinction between AppUnpack's split analysis and apk.sh's rebuilding, signing and Gadget patching.
+
 ZIP preparation rejects unsafe paths, duplicates, links, encrypted entries, ZIP64 and unsupported compression. Limits: 512 APK parts, 2 GiB per APK, 4 GiB total APK bytes and an 8 GiB outer archive. Python and Java also have bounded process deadlines. A failure may leave an owned `inputs` directory for diagnosis.
 
 ## Decode smali and resources with Apktool
