@@ -1,4 +1,21 @@
-# Website and search visibility
+# Repository and search visibility
+
+The primary search target is the [AppUnpack GitHub repository](https://github.com/samalyxx/appunpack). Finding that repository in Google is separate from finding its GitHub Pages website or finding it in GitHub's own search.
+
+## GitHub repository visibility
+
+- The repository's About description identifies it as a local Android APK decompiler and reverse-engineering CLI, naming JADX, split analysis and MCP.
+- Relevant topics include `android-reverse-engineering`, `apk-decompiler`, `apk-analysis`, `jadx`, `apktool`, `ghidra` and `mcp-server`. These place the project in relevant GitHub topic collections.
+- The README starts with a descriptive heading and the actual product explanation before illustrations and demo credits. Installation, output contracts, evidence, limits and releases remain readable on GitHub.
+- Links shared from profiles, demos or relevant write-ups should point directly to `https://github.com/samalyxx/appunpack` when the repository is the intended destination. Useful documentation and real adoption help people evaluate the project; fabricated stars and irrelevant link placement do not.
+
+On 2026-10-23, the public GitHub repository page returned HTTP 200, with no `X-Robots-Tag` or robots meta directive. Its generated title and description contained the project description, and `og:url` pointed to the repository. No repository-level technical indexing prohibition was observed.
+
+The Google query `site:github.com/samalyxx/appunpack AppUnpack` returned no matching documents in the observed search. A [`site:` query](https://developers.google.com/search/docs/monitor-debug/search-operators/all-search-site) is not an exhaustive index report and cannot establish an indexing ban or a penalty. GitHub's own `appunpack in:name` search did return the repository. Its creation date was 2026-10-20.
+
+GitHub controls the repository page's HTML head, crawl rules and canonical handling. Adding a sitemap or verification tag to this project's website does not verify or submit the `github.com` repository URL. The website's Search Console reports apply only to that website and must not be used as evidence of the repository's Google indexing status. There is no guaranteed ranking or deadline.
+
+## Supporting website
 
 The public project website is [samalyxx.github.io/appunpack](https://samalyxx.github.io/appunpack/). It gives search engines a dedicated page about AppUnpack's Android APK reverse-engineering workflow, with links to the GitHub repository, setup instructions and releases.
 

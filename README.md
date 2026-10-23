@@ -1,13 +1,15 @@
-# AppUnpack — Android APK reverse engineering
+# AppUnpack — Android APK decompiler and reverse engineering
 
 **Give it an APK. Get decompiled Java, decoded resources and a local analysis report.**
+
+AppUnpack is a local Android APK decompiler and analysis CLI powered by [JADX](https://github.com/skylot/jadx) through [jadx-headless-mcp](https://github.com/1013503897/jadx-headless-mcp). Analyze a file directly, inspect specific classes and methods, or connect an AI coding agent through MCP. A separate Python command inventories iOS IPA metadata.
 
 [![Checks](https://github.com/samalyxx/appunpack/actions/workflows/ci.yml/badge.svg)](https://github.com/samalyxx/appunpack/actions/workflows/ci.yml)
 [![Release v0.2.1](https://img.shields.io/badge/release-v0.2.1-b4f56a)](https://github.com/samalyxx/appunpack/releases/tag/v0.2.1)
 [![Node.js 24.11+](https://img.shields.io/badge/Node.js-24.11%2B-79dcb6)](https://nodejs.org/)
 [![MIT license](https://img.shields.io/badge/license-MIT-76d6ed)](LICENSE)
 
-[Website](https://samalyxx.github.io/appunpack/) · [Quick start](#quick-start) · [What you get](#what-you-get) · [AI agents](#connect-your-ai-agent) · [FAQ](#faq) · [Documentation](#documentation) · [Releases](https://github.com/samalyxx/appunpack/releases)
+[Quick start](#quick-start) · [What you get](#what-you-get) · [AI agents](#connect-your-ai-agent) · [FAQ](#faq) · [Documentation](#documentation) · [Releases](https://github.com/samalyxx/appunpack/releases) · [Website](https://samalyxx.github.io/appunpack/)
 
 ![AppUnpack: a local APK becomes decompiled Java, decoded resources and an evidence report.](site/assets/hero.svg)
 
@@ -16,8 +18,6 @@
 Real NetGuard 2.337 analysis: manifest, permissions, resources and reconstructed Java. Edited for pacing; recovery is partial. Feature cards summarize code navigation, CLI/MCP and evidence reports.
 
 Music: “Brain Dance” by Kevin MacLeod ([incompetech.com](https://incompetech.com/music/royalty-free/index.html?isrc=USUAN2300006)), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Edited excerpt, loudness adjusted, fades added.
-
-AppUnpack is a local Android APK decompiler and analysis CLI powered by [JADX](https://github.com/skylot/jadx) through [jadx-headless-mcp](https://github.com/1013503897/jadx-headless-mcp). Analyze a file directly, inspect specific classes and methods, or connect an AI coding agent through MCP. A separate Python command inventories iOS IPA metadata.
 
 ## Quick start
 
@@ -205,7 +205,7 @@ The current installation method is a GitHub source checkout or release archive f
 - [Architecture](docs/architecture.md): how the CLI, engine and reports fit together.
 - [Mobile reverse-engineering research](docs/mobile-tooling-research.md): Android and iOS tool comparisons.
 - [Verification](docs/testing.md): reproducible checks, real APK results and limits.
-- [Website and search visibility](docs/seo.md): public metadata and Google Search Console steps.
+- [Repository search visibility](docs/seo.md): GitHub metadata, Google visibility checks and supporting website setup.
 - [Changelog](CHANGELOG.md) and [GitHub releases](https://github.com/samalyxx/appunpack/releases).
 
 ## Contributing and responsible use
